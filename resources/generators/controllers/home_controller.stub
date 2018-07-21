@@ -1,0 +1,22 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyModelNamespace;
+
+use App\Http\Controllers\Controller;
+use App\Http\Daos\DummyModelUcfirstDao;
+class DummyClass extends Controller
+{
+    private $DummyModelLowerDao;
+
+    public function __construct(DummyModelUcfirstDao $DummyModelLowerDao)
+    {
+      $this->DummyModelLowerDao=$DummyModelLowerDao;
+    }
+
+    public function index()
+    {
+
+    }
+}

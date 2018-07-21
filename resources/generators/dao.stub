@@ -1,0 +1,17 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyModelNamespace;
+use Prettus\Repository\Eloquent\BaseRepository;
+class DummyClass extends BaseRepository
+{
+
+    /**
+     * @return string
+     */
+    public function model()
+    {
+        return DummyModelUcfirst::class;
+    }
+}

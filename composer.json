@@ -1,0 +1,45 @@
+{
+    "name": "foryoufeng/laravel-generator",
+    "description": "A tool for generate Laravel code file",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "foryoufeng",
+            "email": "foryoufeng@gmail.com",
+            "homepage": "https://github.com/foryoufeng"
+        }
+    ],
+    "homepage": "https://github.com/foryoufeng/laravel-generator",
+    "keywords": ["Laravel", "laravel-generator"],
+    "require": {
+        "laravel/framework": "^5.5",
+        "barryvdh/laravel-ide-helper": "^2.4",
+        "doctrine/dbal": "^2.7",
+        "league/fractal": "^0.17.0",
+        "prettus/l5-repository": "^2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~6.0",
+        "orchestra/testbench": "~3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Foryoufeng\\Generator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Foryoufeng\\Generator\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Foryoufeng\\Generator\\GeneratorServiceProvider"
+            ],
+            "aliases": {
+                "Generator": "Foryoufeng\\Generator\\Facades\\Generator"
+            }
+        }
+    }
+}
