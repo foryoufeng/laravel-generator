@@ -2,9 +2,9 @@
 
 namespace Foryoufeng\Generator\Console;
 
-use Foryoufeng\Generator\GeneratorServiceProvider;
 use Illuminate\Console\Command;
 use Foryoufeng\Generator\Database\GeneratorSeeder;
+use Foryoufeng\Generator\GeneratorServiceProvider;
 
 class InstallCommand extends Command
 {
@@ -29,9 +29,10 @@ class InstallCommand extends Command
      */
     public function handle()
     {
-        $this->call('vendor:publish', ['--provider'=> GeneratorServiceProvider::class]);
-//        $this->call('migrate');
+        $this->call('vendor:publish', ['--provider' => GeneratorServiceProvider::class]);
+
+        $this->call('migrate');
         //add default seeds
-//        $this->call('db:seed', ['--class' => GeneratorSeeder::class]);
+        $this->call('db:seed', ['--class' => GeneratorSeeder::class]);
     }
 }
