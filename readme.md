@@ -7,10 +7,12 @@
 Requirements
 ------------
  - PHP >= 7.0.0
- - Laravel >= 5.5.0
+ - Laravel >= 5
  
  # For GUI
-<img src="https://cdn.linkgoup.com/laravel-generator.png" alt="laravel-admin">
+<img src="https://cdn.linkgoup.com/laravel_generator_v2_en_index.png" alt="laravel-generator">
+
+## [More Docs](https://doc.linkgoup.com/docs/show/669)
 
 ## Installation
 
@@ -20,14 +22,24 @@ Via Composer
 composer require --dev foryoufeng/laravel-generator
 ```
 
-Then run the command to publish resources and config：
-
+If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
 ```
-php artisan vendor:publish --provider="Foryoufeng\Generator\GeneratorServiceProvider"
+Foryoufeng\Generator\GeneratorServiceProvider::class
 ```
-After run command you can find config file in `config/generator.php`,and you can configure the position of the stub  and the file you want to generate, the default stub will be in `resources/generators` directory, in this file you can config your file.
-now you can access your application `http://yourhost/generator` to use the `laravel-generator`
 
+Then run the command to install the generator
+```
+php artisan generator:install
+```
+
+After run command you can find config file in `config/generator.php`,and now you can access your application `http://yourhost/generator` to use the `laravel-generator`
+
+After the installation is complete, the project generates templates such as model, controllers and views by default. Other templates can be added or modified according to the actual needs of the project.
+
+## templates
+
+<img src="https://cdn.linkgoup.com/laravel_generator_en_template.png" alt="laravel-generator">
+ 
 ## Usage
 the `generator.php` doc
 ```
@@ -37,63 +49,33 @@ return [
     'name' => 'Laravel-generator',
     //the url to access
     'route'=>'generator',//you can change the access url if you do not like it
-    'modelPath'=>'App\\Models\\', //where your models in
-    'views'=>[],  //waiting to finish
-    'multiple'=>[  // to genetate multiple file 
-        // group file
-        [
-            'name'=>'controllers',  // which is the label name in the html
-            //The file suffix
-            'postfix'=>'Controller', //such as UserController,the postfix is Controller ,or UserTest the postfix is Test
-            'group'=>[
-                [
-                    'namespace'=>'App\\Http\\Controllers\\',
-                    'stub'=>resource_path('generators').'/controllers/home_controller.stub',  //where the stub in
-                    'isChecked'=>true //you can change it to false
-                ],
-                [
-                    'namespace'=>'App\\Http\\Controllers\\Api\\',
-                    'stub'=>resource_path('generators').'/controllers/api_controller.stub',
-                    'isChecked'=>true
-                ]
-            ],
-        ]
-    ],
-    //one file
-    'single'=>[  // to genetate one file 
-        [
-            'name'=>'dao',
-            'namespace'=>'App\\Http\\Daos\\',
-            'stub'=>resource_path('generators').'/dao.stub',
-            'isChecked'=>true,
-            'postfix'=>'Dao'
-        ]
-    ],
+     //the rule  can be used by the field  , You can define the format of the fields you need.
+      'rules'=>[
+          'string',
+          'email',
+          'file',
+          'numeric',
+          'array',
+          'alpha',
+          'alpha_dash',
+          'alpha_num',
+          'date',
+          'boolean',
+          'distinct',
+          'phone',
+      ],
 ];
 ```
 
 ## stub
-```
-<?php
+You can define the format of the stub you need followed by my rules,such as
 
-namespace DummyNamespace; //which is the `namespace` you defined in the config
+<img src="https://cdn.linkgoup.com/laravel_generator_v2_en.png" alt="laravel-generator">
 
-use DummyModelNamespace; //is the model such as App\Models\User
-use Prettus\Repository\Eloquent\BaseRepository;
-//is the `model_name`.`postfix` such as `UserController`
-class DummyClass extends BaseRepository  
-{
+## Notice
 
-    /**
-     * @return string
-     */
-    public function model()
-    {
-        //`DummyModelUcfirst` is mean to the model_name ,such as `User`
-        return DummyModelUcfirst::class;
-    }
-}
-```
+Only Chinese and English are supported by laravel generator now 
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.

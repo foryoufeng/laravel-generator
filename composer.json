@@ -10,9 +10,9 @@
         }
     ],
     "homepage": "https://github.com/foryoufeng/laravel-generator",
-    "keywords": ["Laravel", "laravel-generator"],
+    "keywords": ["Laravel", "laravel-generator","code generator"],
     "require": {
-        "laravel/framework": "^5.5",
+        "laravel/framework": "^5.0",
         "barryvdh/laravel-ide-helper": "^2.4",
         "doctrine/dbal": "^2.7",
         "prettus/l5-repository": "^2.6"
@@ -34,10 +34,7 @@
         "laravel": {
             "providers": [
                 "Foryoufeng\\Generator\\GeneratorServiceProvider"
-            ],
-            "aliases": {
-                "Generator": "Foryoufeng\\Generator\\Facades\\Generator"
-            }
+            ]
         }
     }
 }

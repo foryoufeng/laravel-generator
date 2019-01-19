@@ -5,10 +5,12 @@
 要求
 ------------
  - PHP >= 7.0.0
- - Laravel >= 5.5.0
+ - Laravel >= 5
  
  # UI界面
-<img src="https://cdn.linkgoup.com/laravel-generator.png" alt="laravel-admin">
+<img src="https://cdn.linkgoup.com/laravel_generator_zh_index.png" alt="laravel-generator">
+
+## [更多文档](https://doc.linkgoup.com/docs/show/669)
 
 ## 安装
 
@@ -18,14 +20,28 @@
 composer require --dev foryoufeng/laravel-generator
 ```
 
-运行如下命令来发布资源文件
+如果你是运行的Laravel 5.5以下的版本，需要在`config/app.php`的service provider中添加：
 
 ```
-php artisan vendor:publish --provider="Foryoufeng\Generator\GeneratorServiceProvider"
+Foryoufeng\Generator\GeneratorServiceProvider::class
 ```
-运行后，你能在`config/generator.php`中配置你的代码生成数据,代码模板默认在`resources/generators` 目录下, 
+
+运行如下命令来安装代码生成器
+
+```
+php artisan generator:install
+```
+
+运行后，你能在`config/generator.php`中配置你的代码
+
 现在你可以访问你的应用url`http://yourhost/generator` 来使用`laravel-generator`了
 
+安装完成后，项目默认生成了model,controllers和views这几个模板，其他模板可以根据自己项目的实际需要进行添加或者修改
+
+## 模板
+
+<img src="https://cdn.linkgoup.com/laravel_generator_zh_template.png" alt="laravel-generator">
+  
 ## 用法
 `generator.php` 文件说明
 ```
@@ -35,62 +51,34 @@ return [
     'name' => 'Laravel-generator',//应用的名称
     //访问的地址
     'route'=>'generator',//如果你不想访问这个地址，可以换掉
-    'modelPath'=>'App\\Models\\', //模型所在的命名空间
-    'views'=>[],  //待实现
-    'multiple'=>[  // 多文件生成
-        // group file
-        [
-            'name'=>'controllers',  // 在界面的label中显示的名称
-            //文件的后缀
-            'postfix'=>'Controller', //如UserController,后缀是Controller ,或者 UserTest 后缀是Test
-            'group'=>[
-                [
-                    'namespace'=>'App\\Http\\Controllers\\',//所在的空间
-                    'stub'=>resource_path('generators').'/controllers/home_controller.stub',  //模板所在位置
-                    'isChecked'=>true //页面上是否选中
-                ],
-                [
-                    'namespace'=>'App\\Http\\Controllers\\Api\\',
-                    'stub'=>resource_path('generators').'/controllers/api_controller.stub',
-                    'isChecked'=>true
-                ]
-            ],
-        ]
-    ],
-    'single'=>[  // 单个文件生成
-        [
-            'name'=>'dao',
-            'namespace'=>'App\\Http\\Daos\\',
-            'stub'=>resource_path('generators').'/dao.stub',
-            'isChecked'=>true,
-            'postfix'=>'Dao'
-        ]
-    ],
+    //字段的规则 , 你也可以定义你自己的验证规则
+         'rules'=>[
+             'string',
+             'email',
+             'file',
+             'numeric',
+             'array',
+             'alpha',
+             'alpha_dash',
+             'alpha_num',
+             'date',
+             'boolean',
+             'distinct',
+             'phone',
+         ],
 ];
 ```
 
 ## 模板
-```
-<?php
+你可以根据项目给出的模板格式来定义你说需要的模板，例如
 
-namespace DummyNamespace; //会被替换为你在配置文件中定义的`namespace` 
+<img src="https://cdn.linkgoup.com/laravel_generator_v2_zh.png" alt="laravel-generator">
 
-use DummyModelNamespace; //模型的路径 如App\Models\User
-use Prettus\Repository\Eloquent\BaseRepository;
-//变成模型名拼接后缀`model_name`.`postfix`  如`UserController`
-class DummyClass extends BaseRepository  
-{
 
-    /**
-     * @return string
-     */
-    public function model()
-    {
-        //`DummyModelUcfirst` 对应模型名，如 `User`
-        return DummyModelUcfirst::class;
-    }
-}
-```
+## 注意
+
+项目现在只支持中文和英文2种语言
+
 ## 更新记录
 
 查看 [changelog](changelog.md) 获取更新记录

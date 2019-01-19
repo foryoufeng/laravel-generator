@@ -1,442 +1,521 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>{{ config('generator.name') }}</title>
-
-    <!-- Fonts -->
-    <link href="/vendor/laravel-generator/css/element.css" rel="stylesheet" type="text/css">
-
-    <!-- Styles -->
-</head>
-<style>
-    .content {
-        margin:  0px auto;
-    }
-   .header {
-       text-align: center;
-   }
-    .footer{
-        text-align: center;
-    }
-    .grid-content {
-        border-radius: 4px;
-        min-height: 36px;
-    }
-    .row-bg {
-        padding: 10px 0;
-        background-color: #f9fafc;
-    }
-    .header{
-        color:#3A88FD;
-        padding: 20px;
-        font-size: 30px;
-    }
-    #app input{
-    }
-    .el-form--label-top .el-form-item__label{
-        font-size: 16px;
-        font-weight: bold;
-    }
-</style>
-<body>
-<div id="app" class="content" v-cloak>
-    <div >
-        <el-container>
-
-            <el-header class="header">
-                <i class="el-icon-rank"></i>{{ config('generator.name') }}
-            </el-header>
-            <el-main>
-                <el-tabs type="border-card">
-                    <el-tab-pane>
-                        <span slot="label"><i class="el-icon-menu"></i> generator</span>
-
-                        <el-form label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" class="demo-ruleForm">
-                            <el-form-item label="model" prop="modelName">
-                                <el-input v-model="ruleForm.modelName"  style="float: left;width: 400px;margin-right: 20px"></el-input><span v-if="ruleForm.modelName"><el-tag type="success">@{{modelSave}}</el-tag></span>
-                            </el-form-item>
-                            <el-form-item >
-                                <el-checkbox-group v-model="ruleForm.create">
-                                    <el-checkbox label="migration">Create migration</el-checkbox>
-                                    <el-checkbox label="model">Create model</el-checkbox>
-                                    <el-checkbox label="migrate">Run migrate</el-checkbox>
-                                    <el-checkbox label="ide-helper">ide-helper:models</el-checkbox>
-                                </el-checkbox-group>
-                            </el-form-item>
-                            @foreach($checkLists as $checkList)
-                            <el-form-item label="{{ $checkList['name'] }}">
-                                <el-checkbox-group v-model="ruleForm.{{ $checkList['name'] }}">
-                                    <el-checkbox v-for="item in all_{{ $checkList['name'] }}" :label="item" :key="item">@{{item}}<span v-if="ruleForm.modelName">@{{ruleForm.modelName}}{{ $checkList['postfix'] }}</span></el-checkbox>
-                                </el-checkbox-group>
-                            </el-form-item>
-                            @endforeach
-                            <el-form-item :label="file.name" v-for="(file,index) in ruleForm.single">
-                                    <el-checkbox v-model="file.isChecked" style="margin-left: 20px" @change="handleCheck(file,index)">@{{ file.namespace }}<span v-if="ruleForm.modelName">@{{ruleForm.modelName}}@{{file.postfix}}</span></el-checkbox>
-                            </el-form-item>
-                            <el-form-item label="unit test">
-                                <el-checkbox v-model="ruleForm.unittest" style="margin-left: 20px">\Tests\Unit\<span v-if="ruleForm.modelName">@{{ruleForm.modelName}}Test</span></el-checkbox>
-                            </el-form-item>
-                            <el-form-item label="table fileds" prop="delivery">
-                                <el-row >
-                                    <el-col :span="2">Field name</el-col>
-                                    {{--<el-col :span="3" style="margin-left: 20px">Display name</el-col>--}}
-                                    {{--<el-col :span="1">Searchable</el-col>--}}
-                                    <el-col :span="3" style="margin-left: 20px">Type</el-col>
-                                    <el-col :span="1">Nullable</el-col>
-                                    <el-col :span="3">Key</el-col>
-                                    <el-col :span="3" style="margin-left: 20px">Default value</el-col>
-                                    <el-col :span="3" style="margin-left: 20px">Comment</el-col>
-                                    <el-col :span="2" style="margin-left: 10px">Action</el-col>
-                                </el-row>
-                                <el-row v-for="(table,index) in ruleForm.table_fields" style="margin-bottom: 20px">
-                                    <el-col :span="2">
-                                        <el-input v-model="table.field_name" placeholder="field name"></el-input>
-                                    </el-col>
-                                    {{--<el-col :span="3" style="margin-left: 20px">--}}
-                                        {{--<el-input v-model="table.display_name" placeholder="display name"></el-input>--}}
-                                    {{--</el-col>--}}
-                                    {{--<el-col :span="1">--}}
-                                    {{--<el-checkbox v-model="table.searchable" style="margin-left: 20px"></el-checkbox>--}}
-                                    {{--</el-col>--}}
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-select v-model="table.type" placeholder="please select"  filterable >
-                                            <el-option
-                                                    v-for="item in dbTypes"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </el-col>
-                                    <el-col :span="1">
-                                        <el-checkbox v-model="table.nullable" style="margin-left: 20px"></el-checkbox>
-                                    </el-col>
-                                    <el-col :span="3">
-                                        <el-select v-model="table.key" placeholder="please select">
-                                            <el-option
-                                                    v-for="item in keys"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </el-col>
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-input v-model="table.default" placeholder="default value"></el-input>
-                                    </el-col>
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-input v-model="table.comment" placeholder="comment"></el-input>
-                                    </el-col>
-                                    <el-col :span="2" style="margin-left: 10px"><el-button type="danger" icon="el-icon-delete"  @click="deleteTable(index)">remove</el-button></el-col>
-                                </el-row>
-                            </el-form-item>
-                            <el-form-item >
-                                <el-button type="success" @click="addTable" icon="el-icon-plus" style="float: left;">Add field</el-button>
-                                <span style="float: left;margin-left:100px;">Primary key</span><el-input v-model="ruleForm.primary_key"  style="float: left;width: 200px;margin-right: 50px"></el-input>
-                                <el-switch
-                                        v-model="ruleForm.timestamps"
-                                        active-text="Created_at & Updated_at"
-                                >
-                                </el-switch>
-                                <el-switch
-                                        v-model="ruleForm.soft_deletes"
-                                        active-text="Soft deletes"
-                                >
-                                </el-switch>
-                            </el-form-item>
-
-                            <el-form-item>
-                                <el-button type="primary" @click="submitForm('ruleForm')" :loading="loadding">submit</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </el-tab-pane>
-                    <el-tab-pane>
-                        <span slot="label"><i class="el-icon-document"></i> migrate </span>
-                        <el-form label-position="top" :model="migrateForm" :rules="rules" ref="migrateForm" label-width="200px" class="demo-ruleForm">
-                            <el-form-item label="prefix" prop="prefix">
-                                <el-input v-model="migrateForm.prefix"  style="float: left;width: 400px;margin-right: 20px"></el-input>
-                            </el-form-item>
-                            <el-form-item label="tableName" prop="tableName">
-                                <el-input v-model="migrateForm.tableName"  style="float: left;width: 400px;margin-right: 20px"></el-input><span v-if="migrateForm.tableName && migrateName"><el-tag type="success">@{{migrateName}}</el-tag></span>
-                            </el-form-item>
-                            <el-form-item >
-                                <el-checkbox-group v-model="migrateForm.doMigrate">
-                                    {{--<el-checkbox label="migration">Create migration</el-checkbox>--}}
-                                    <el-checkbox label="migrate">Run migrate</el-checkbox>
-                                </el-checkbox-group>
-                            </el-form-item>
-                            <el-form-item label="table fileds" prop="delivery">
-                                <el-row >
-                                    <el-col :span="2">Field name</el-col>
-
-                                    <el-col :span="3" style="margin-left: 20px">Type</el-col>
-                                    <el-col :span="1">Nullable</el-col>
-                                    <el-col :span="3">Key</el-col>
-                                    <el-col :span="3" style="margin-left: 20px">Default value</el-col>
-                                    <el-col :span="3" style="margin-left: 20px">Comment</el-col>
-                                    <el-col :span="1">Change</el-col>
-                                    <el-col :span="2" style="margin-left: 10px">Action</el-col>
-                                </el-row>
-                                <el-row v-for="(table,index) in migrateForm.table_fields" style="margin-bottom: 20px">
-                                    <el-col :span="2">
-                                        <el-input v-model="table.field_name" placeholder="field name"></el-input>
-                                    </el-col>
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-select v-model="table.type" placeholder="please select"  filterable >
-                                            <el-option
-                                                    v-for="item in dbTypes"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </el-col>
-                                    <el-col :span="1">
-                                        <el-checkbox v-model="table.nullable" style="margin-left: 20px"></el-checkbox>
-                                    </el-col>
-                                    <el-col :span="3">
-                                        <el-select v-model="table.key" placeholder="please select">
-                                            <el-option
-                                                    v-for="item in keys"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </el-col>
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-input v-model="table.default" placeholder="default value"></el-input>
-                                    </el-col>
-                                    <el-col :span="3" style="margin-left: 20px">
-                                        <el-input v-model="table.comment" placeholder="comment"></el-input>
-                                    </el-col>
-                                    <el-col :span="1">
-                                        <el-checkbox v-model="table.change" style="margin-left: 20px"></el-checkbox>
-                                    </el-col>
-                                    <el-col :span="2" style="margin-left: 10px"><el-button type="danger" icon="el-icon-delete"  @click="deleteMigrateTable(index)">remove</el-button></el-col>
-                                </el-row>
-                            </el-form-item>
-                            <el-form-item >
-                                <el-button type="success" @click="addMigrateTable" icon="el-icon-plus" style="float: left;">Add field</el-button>
-                            </el-form-item>
-
-                            <el-form-item>
-                                <el-button type="primary" @click="submitMigrateForm('migrateForm')" :loading="loadding">submit</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </el-tab-pane>
-                </el-tabs>
-
-            </el-main>
-            <el-footer class="footer"> ©{{ config('generator.name') }}</el-footer>
-        </el-container>
-</div>
-</div>
-<script src="/vendor/laravel-generator/js/vue.js"></script>
-<script src="/vendor/laravel-generator/js/axios.js"></script>
-<script src="/vendor/laravel-generator/js/element-2.4.js"></script>
-<script>
-    const vm=new Vue({
-        el: '#app',
-        data:{
-            loadding:false,
-            dbTypes:@json($dbTypes),
-            keys: [{
-                value: '',
-                label: 'NULL'
-            }, {
-                value: 'unique',
-                label: 'Unique'
-            }, {
-                value: 'index',
-                label: 'Index'
-            }],
-            @foreach($all_checkLists as $all_checkList)
-            '{{ $all_checkList['name'] }}':@json($all_checkList['value']),
-            @endforeach
-            ruleForm: {
-                modelName: '',
-                create:[
-                    'migration',
-                    'model',
-                   'migrate',
-                    'ide-helper'
+@extends('laravel-generator::layout')
+@section('content')
+    <el-tabs type="border-card" value="{{ $tab }}">
+        {{--generator--}}
+        @include('laravel-generator::generator')
+        {{--migrate--}}
+        @include('laravel-generator::generator_migrate')
+        {{--templates--}}
+        @include('laravel-generator::template_lists')
+    </el-tabs>
+@endsection
+@section('css')
+    <style>
+        .subButton{
+            width: 150px;
+            height: 50px;
+            margin-left: 30px;
+        }
+        .margin_top{
+            padding: 10px;
+        }
+    </style>
+@endsection
+@section('js')
+    <script src="/vendor/laravel-generator/js/baiduTemplate.js"></script>
+    <script>
+        var vm =new Vue({
+            el: '#app',
+            data:{
+                loadding:false,
+                dbTypes:@json($dbTypes),
+                keys: [
+                    {
+                    value: '',
+                    label: 'NULL'
+                }, {
+                    value: 'unique',
+                    label: 'unique'
+                }, {
+                    value: 'index',
+                    label: 'index'
+                }
                 ],
-                primary_key:'id',
-                timestamps:true,
-                table_fields:[{
-                    field_name:'',
-                    _display_name:'',
-                    type:'string',
-                    nullable:false,
-                    key:'',
-                    default:'',
-                    comment:''
+                //外键约束关系
+                onDeleteUpdate: [
+                    {
+                    value: 'cascade',
+                    label: 'CASCADE'
+                }, {
+                    value: 'set null',
+                    label: 'SET NULL'
+                }, {
+                    value: 'no action',
+                    label: 'NO ACTION'
+                }, {
+                    value: 'restrict',
+                    label: 'RESTRICT'
+                  }
+                ],
+                //可用的关系
+                relationships:[
+                    {
+                        value: 'belongsTo',
+                        label: 'belongsTo'
+                    }, {
+                        value: 'hasOne',
+                        label: 'hasOne'
+                    }, {
+                        value: 'hasMany',
+                        label: 'hasMany'
+                    }, {
+                        value: 'belongsToMany',
+                        label: 'belongsToMany'
+                    }
+                ],
+                //数据格式
+                fieldRules:@json($rules),
+                isShowForeign:false,
+                isShowRelationship:false,
+                referencesFileds:[],
+                //搜索数据
+                search:{
+                    name:''
+                },
+                //模板数据
+                templates:[],
+                //数据库表数据
+                tables:@json($tables),
+                //可用的假属性
+                dummyAttrs:@json($dummyAttrs),
+                dummyValues:[],
+                //模板列表
+                template_types:@json($template_types['datas']),
+                ruleForm: {
+                    modelName: '',
+                    modelDisplayName: '',
+                    create:[
+                        'migration',
+                        'migrate',
+                        'ide-helper',
+                        'unittest'
+                    ],
+                    primary_key:'id',
+                    timestamps:true,
+                    foreigns:[],
+                    relationships:[],
+                    table_fields:[{
+                        field_name:'',
+                        _display_name:'',
+                        type:'string',
+                        nullable:false,
+                        is_show_lists:true,
+                        can_search:false,
+                        key:'',
+                        default:'',
+                        comment:'',
+                        attach:'',
                     }],
-                single:@json(config('generator.single')),
-                soft_deletes:false,
-                unittest:true,
-                @foreach($checkLists as $checkList)
-                '{{ $checkList['name'] }}':@json($checkList['value']),
-                @endforeach
+                    soft_deletes:false,
+                    //选中的模板数据
+                    templates:{
+                        @foreach($template_types['datas'] as $templates)
+                        '{{ $templates['name'] }}':@json($templates['checked']),
+                        @endforeach
+                    },
+                },
+                migrateForm:{
+                    prefix:'add',
+                    tableName:'',
+                    doMigrate:[
+                        'migration',
+                        'migrate'
+                    ],
+                    table_fields:[{
+                        field_name:'',
+                        change:false,
+                        type:'string',
+                        nullable:false,
+                        key:'',
+                        default:'',
+                        comment:''
+                    }],
+                },
+                rules: {
+                    prefix: [
+                        { required: true, message: 'prefix @lang('laravel-generator::generator.required')', trigger: 'blur' },
+                    ],
+                    modelName: [
+                        { required: true, message: 'model @lang('laravel-generator::generator.required')', trigger: 'blur' },
+                    ],
+                    modelDisplayName: [
+                        { required: true, message: '@lang('laravel-generator::generator.modelDisplayName') @lang('laravel-generator::generator.required')', trigger: 'blur' },
+                    ],
+                    tableName: [
+                        { required: true, message: 'table name @lang('laravel-generator::generator.required')', trigger: 'blur' },
+                    ],
+                }
             },
-            migrateForm:{
-                prefix:'add',
-                tableName:'',
-                doMigrate:[
-                    'migration',
-                    'migrate'
-                ],
-                table_fields:[{
-                    field_name:'',
-                    change:false,
-                    type:'string',
-                    nullable:false,
-                    key:'',
-                    default:'',
-                    comment:''
-                }],
-            },
-            rules: {
-                prefix: [
-                    { required: true, message: 'prefix is required', trigger: 'blur' },
-                ],
-                modelName: [
-                    { required: true, message: 'model is required', trigger: 'blur' },
-                ],
-                tableName: [
-                    { required: true, message: 'table name is required', trigger: 'blur' },
-                ],
-            }
-        },
-        computed: {
-             modelSave: function () {
-                 if(this.ruleForm.modelName){
-                     this.ruleForm.modelName=this.ruleForm.modelName[0].toUpperCase()+this.ruleForm.modelName.substring(1)
-                 }
-                 return @json($generator['modelPath'])+this.ruleForm.modelName;
-             },
-            migrateName:function () {
-                var name=this.migrateForm.prefix+'_';
-                if(this.migrateForm.table_fields.length>2){
-                    name+=this.migrateForm.table_fields[0]['field_name']+'AndMore_'
-                }else{
-                    var column='';
-                    for (var index in this.migrateForm.table_fields){
-                        var field=this.migrateForm.table_fields[index]['field_name'];
-                        if(field){
-                            name+=field+'_';
+            computed: {
+                migrateName:function () {
+                    var name=this.migrateForm.prefix+'_';
+                    if(this.migrateForm.table_fields.length>2){
+                        name+=this.migrateForm.table_fields[0]['field_name']+'AndMore_'
+                    }else{
+                        var column='';
+                        for (var index in this.migrateForm.table_fields){
+                            var field=this.migrateForm.table_fields[index]['field_name'];
+                            if(field){
+                                name+=field+'_';
+                            }
                         }
                     }
+                    name+='to_'+this.migrateForm.tableName+'_table';
+                    return name;
+                },
+                foreignFileds: function () {
+                    var fields=[];
+                    for (var index in this.ruleForm.table_fields) {
+                        var field=this.ruleForm.table_fields[index]['field_name'];
+                        if(field){
+                            fields.push({
+                                'label':field,
+                                'value':field,
+                            });
+                        }
+                    }
+                    return fields;
                 }
-                name+='to_'+this.migrateForm.tableName+'_table';
-                return name;
-            }
-        },
-        mounted(){
+            },
+            watch:{
+                //监听模型的变化
+                'ruleForm.modelName': function(val){
+                   if(val){
+                       //设置模型的名称
+                       this.ruleForm.modelName=this.ruleForm.modelName[0].toUpperCase()+this.ruleForm.modelName.substring(1);
+                       var route='{{ route('generator.dummyValues',['name'=>'']) }}'+'/'+this.ruleForm.modelName;
+                       //获取请求的数据
+                       axios.get(route).then(function(res){
+                           if(res.data.errcode==0){
+                               var dummyValues=res.data.data;
+                               vm.dummyValues=dummyValues;
+                               var i=0;
+                               for (item of vm.template_types){
+                                   for (template of item.templates){
+                                       //替换路径
+                                       var path=vm.replaceDummyClass(template.path,dummyValues);
+                                       //替换文件名
+                                       var file_name=vm.replaceDummyClass(template.file_name,dummyValues);
+                                       template.file_real_name=path+file_name;
+                                   }
+                                   vm.$set(vm.template_types,i,item);
+                                   i++;
+                               }
+                           }
+                       })
 
-        },
-        methods:{
-            handleCheck(item,index){
-                Vue.set(this.ruleForm.single,index,item)
-            },
-            submitForm(formName) {
-                console.log(this.ruleForm);
-                //return;
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.loadding=true;
-                        axios.post('{{  URL::current() }}',this.ruleForm).then(function(res){
-                            if(res.data.code==200){
-                                var data=res.data.data;
-                                var message='';
-                                for(x in data){
-                                    message+='<p>'+x+':'+data[x]+"</p><br>";
+                   }
+                },
+                //监听关联关系的变化
+                'ruleForm.relationships': {
+                    handler(val, oldVal){
+                        if(val && this.ruleForm.modelName){
+                            for(relationship of this.ruleForm.relationships){
+                                if(relationship.relationship &&relationship.model){
+                                        relationship.model=relationship.model[0].toUpperCase()+relationship.model.substring(1);
+                                        var foreign_key='';
+                                        if(relationship.foreign_key){
+                                            foreign_key=',\''+relationship.foreign_key+'\'';
+                                        }
+                                        this.getDummyValues(relationship.model).then(function (res) {
+                                            relationship.camel_model=res['DummyCamelClass'];
+                                            relationship.snake_model=res['DummySnakeClass'];
+                                            relationship.snake_plural_model=res['DummySnakePluralClass'];
+                                        });
+                                        relationship.relation=vm.ruleForm.modelName+' add: return $this->'+relationship.relationship+'('+relationship.model+'::class'+foreign_key+')';
+                                        if(relationship.reverse){
+                                            relationship.reverseRelation=relationship.model+' add:  return $this->'+relationship.reverse+'('+vm.ruleForm.modelName+'::class'+foreign_key+')';
+                                        }else{
+                                            relationship.reverseRelation='';
+                                        }
+                                  }
                                 }
-                                vm.$message({
-                                    title: 'success',
-                                    dangerouslyUseHTMLString: true,
-                                    message: message,
-                                    center: true,
-                                    type: 'success',
-                                    duration:5000
-                                });
-                            }else{
-                                vm.$message.error(res.data.message);
+
                             }
-                            vm.loadding=false;
-                        });
-                    } else {
-                        return false;
+                    },
+                    deep:true
+                },
+            },
+            mounted(){
+                //加载数据
+                this.getData();
+            },
+            methods:{
+                /**
+                 * 处理回车换行
+                 */
+                handleEnterKey(codeTemplate) {
+                    codeTemplate = this.replaceAll(codeTemplate,"\t","    ");
+                    var returnCode = "";
+                    var codes = codeTemplate.split("\n");
+                    for(var i = 0 ; i < codes.length; i ++) {
+                        if (codes[i].trim().indexOf("<%") == 0) {
+                            if(codes[i].trim().indexOf('<%\=') == 0){
+                                returnCode+=codes[i].trim()+ "``";
+                            }else {
+                                returnCode += codes[i].trim()
+                            }
+                        }else{
+                            returnCode+=codes[i]+ "``";
+                        }
                     }
-                });
-            },
-            addTable(){
-                this.ruleForm.table_fields.push({
-                    field_name:'',
-                    _display_name:'',
-                    searchable:false,
-                    type:'string',
-                    nullable:false,
-                    key:'',
-                    default:'',
-                    comment:''
-                });
-            },
-            deleteTable(index){
-                this.ruleForm.table_fields.splice(index,1)
-            },
-            addMigrateTable(){
-                this.migrateForm.table_fields.push({
-                    field_name:'',
-                    _display_name:'',
-                    searchable:false,
-                    type:'string',
-                    nullable:false,
-                    key:'',
-                    default:'',
-                    comment:''
-                });
-            },
-            deleteMigrateTable(index){
-                this.migrateForm.table_fields.splice(index,1)
-            },
-            submitMigrateForm(migrateForm) {
-                console.log(this.migrateForm);
-                this.$refs[migrateForm].validate((valid) => {
-                    if (valid) {
-                        this.loadding=true;
-                        axios.post('{{  URL::current() }}',this.migrateForm).then(function(res){
-                            if(res.data.code==200){
-                                var data=res.data.data;
-                                var message='';
-                                for(x in data){
-                                    message+='<p>'+x+':'+data[x]+"</p><br>";
+
+                    return returnCode;
+                },
+                /**
+                 * 获取解析模板的数据
+                 */
+                getTemplateCode(template,data){
+                    var code=this.handleEnterKey(template);
+                    code=this.replaceDummyClass(code,this.dummyValues);
+                    var temp=baidu.template(code, data);
+                    var html=this.replaceAll(temp,"``","\n")
+                    html=this.replaceAll(html,'&#92;','\\')
+                    return this.replaceAll(html,'&#39;','\'');
+                },
+                /**
+                 * 获取解析的数据
+                 */
+                getTemplateData(){
+                    baidu.template.ESCAPE = false;
+                    var modelFields={
+                        primary_key:this.ruleForm.primary_key,
+                        timestamps:this.ruleForm.timestamps,
+                        soft_deletes:this.ruleForm.soft_deletes,
+                    };
+                    return {
+                        DummyTableFields:this.ruleForm.table_fields,
+                        DummyModelFields:modelFields,
+                        DummyRelationShips:this.ruleForm.relationships,
+                    }
+                },
+                /**
+                 * 获取模型的转换数据
+                 */
+                async getDummyValues(model){
+                    var route='{{ route('generator.dummyValues',['name'=>'']) }}'+'/'+model;
+                    let res=await axios.get(route);
+                    return new Promise(function (resolve,reject) {
+                        if(res.data.errcode==0){
+                            resolve(res.data.data)
+                        }else{
+                            reject(new Error('request error '));
+                        }
+                    })
+                },
+                /**
+                 * 替换全部
+                 */
+                replaceAll(strVal,search,replace){
+                    return strVal.replace(new RegExp(search,"gm"),replace);
+                },
+                //获取模板列表数据
+                getData(){
+                    axios.get('{{ route('generator.template.index') }}',{params:this.search}).then(function (res) {
+                        var data=res.data;
+                        if(data.errcode==0){
+                            vm.templates=data.data;
+                        }else {
+                            vm.templates=[];
+                        }
+                    })
+                },
+                //替换掉所有的模板变量
+                replaceDummyClass(str,dummyValues){
+                    for (var index in this.dummyAttrs){
+                        if(index=='tableFields' || index=='modelFields' || index=='relationships'){
+                            continue;
+                        }
+                        str=str.replace(new RegExp(this.dummyAttrs[index],"gm"),dummyValues[this.dummyAttrs[index]]);
+                    }
+                    return str;
+                },
+                //添加外键约束
+                addForeign(){
+                    var flen=this.ruleForm.foreigns.length;
+                    var tlen=this.ruleForm.table_fields.length;
+                    this.isShowForeign=true;
+                    if(tlen>flen){
+                        this.ruleForm.foreigns.push({
+                            foreign:'',
+                            references:'',
+                            on:''
+                        });
+                    }
+                },
+                //添加关联关系
+                addRelationship(){
+                    this.isShowRelationship=true;
+                    this.ruleForm.relationships.push({
+                        relationship:'belongsTo',
+                        model:'UserLog',
+                        foreign_key:'',
+                        reverse:'',
+                    });
+                },
+                //删除关联关系的处理
+                deleteRelationship(index){
+                    this.ruleForm.relationships.splice(index,1);
+                },
+                //监听外键数据的处理
+                onForeignChange(index){
+                    var _table=this.ruleForm.foreigns[index].on;
+                    var result=this.tables.find(function(item){
+                        return item.name== _table;
+                    });
+                    this.referencesFileds[index]=result.columns;
+                },
+                //删除外键的处理
+                deleteForeign(index){
+                    this.ruleForm.foreigns.splice(index,1);
+                    this.referencesFileds.splice(index,1);
+                },
+                //删除模板
+                deleteTemplate(id){
+                    this.$confirm('@lang('laravel-generator::generator.confirmDelete')', '@lang('laravel-generator::generator.notice')', {
+                        confirmButtonText: '@lang('laravel-generator::generator.sure')',
+                        cancelButtonText: '@lang('laravel-generator::generator.cancel')',
+                        type: 'warning'
+                    }).then(() => {
+                            axios.post('{{ route('generator.template.delete')  }}',{id:id}).then(function (res) {
+                                if(res.data.errcode==0){
+                                    var href='{{ route('generator.index') }}?tab=templates'
+                                    window.location.href=href;
+                                }else{
+                                    vm.$message.error(res.data.message);
                                 }
-                                vm.$message({
-                                    title: 'success',
-                                    dangerouslyUseHTMLString: true,
-                                    message: message,
-                                    center: true,
-                                    type: 'success',
-                                    duration:5000
-                                });
-                            }else{
-                                vm.$message.error(res.data.message);
+                            });
+                        })
+                        .catch(() => {});
+                },
+                //提交generator表单
+                submitForm(formName) {
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            //获取选中的模板
+                            var check_templates=this.ruleForm.templates;
+                            var generator_templates=[];
+                            //所有可用的模板
+                            for (item of this.template_types){
+                                var all_templates=item.templates;
+                                var check_template_ids=check_templates[item['name']];
+                                for (id of check_template_ids){
+                                        var temp=all_templates.find(function (t) {
+                                            return t.id==id;
+                                        });
+                                        //获取解析的模板数据
+                                        var generator_template={
+                                            file_real_name:temp.file_real_name,
+                                            template:this.getTemplateCode(temp.template,this.getTemplateData())
+                                        };
+                                        generator_templates.push(generator_template);
+                                }
                             }
-                            vm.loadding=false;
-                        });
-                    } else {
-                        return false;
-                    }
-                });
+                            this.ruleForm.generator_templates=generator_templates;
+                            this.loadding=true;
+                            axios.post('{{  \Illuminate\Support\Facades\URL::current() }}',this.ruleForm).then(function(res){
+                                if(res.data.errcode==0){
+                                    var data=res.data.data;
+                                    var message='';
+                                    for(x in data){
+                                        message+='<p>'+x+':'+data[x]+"</p><br>";
+                                    }
+                                    vm.$message({
+                                        title: 'success',
+                                        dangerouslyUseHTMLString: true,
+                                        message: message,
+                                        center: true,
+                                        type: 'success',
+                                        duration:5000
+                                    });
+                                }else{
+                                    vm.$message.error(res.data.message);
+                                }
+                                vm.loadding=false;
+                            });
+                        } else {
+                            return false;
+                        }
+                    });
+                },
+                //新增表字段
+                addTable(){
+                    this.ruleForm.table_fields.push({
+                        field_name:'',
+                        _display_name:'',
+                        searchable:false,
+                        type:'string',
+                        is_show_lists:true,
+                        can_search:false,
+                        nullable:false,
+                        key:'',
+                        default:'',
+                        comment:''
+                    });
+                },
+                //删除表字段
+                deleteTable(index){
+                    this.ruleForm.table_fields.splice(index,1)
+                },
+                //添加删除migrate中的表单数据
+                addMigrateTable(){
+                    this.migrateForm.table_fields.push({
+                        field_name:'',
+                        _display_name:'',
+                        searchable:false,
+                        type:'string',
+                        nullable:false,
+                        key:'',
+                        default:'',
+                        comment:''
+                    });
+                },
+                //删除migrate中的表单数据
+                deleteMigrateTable(index){
+                    this.migrateForm.table_fields.splice(index,1)
+                },
+                //提交migrate中的表单数据
+                submitMigrateForm(migrateForm) {
+                    this.$refs[migrateForm].validate((valid) => {
+                        if (valid) {
+                            this.loadding=true;
+                            axios.post('{{  \Illuminate\Support\Facades\URL::current() }}',this.migrateForm).then(function(res){
+                                if(res.data.errcode==0){
+                                    var data=res.data.data;
+                                    var message='';
+                                    for(x in data){
+                                        message+='<p>'+x+':'+data[x]+"</p><br>";
+                                    }
+                                    vm.$message({
+                                        title: 'success',
+                                        dangerouslyUseHTMLString: true,
+                                        message: message,
+                                        center: true,
+                                        type: 'success',
+                                        duration:5000
+                                    });
+                                }else{
+                                    vm.$message.error(res.data.message);
+                                }
+                                vm.loadding=false;
+                            });
+                        } else {
+                            return false;
+                        }
+                    });
+                }
             }
-        }
-    });
-</script>
-</body>
-</html>
+        });
+
+    </script>
+@endsection

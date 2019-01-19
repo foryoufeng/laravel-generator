@@ -12,6 +12,8 @@ class MigrationCreator extends BaseMigrationCreator
     protected $bluePrint = '';
 
     protected $isCreate=true;
+
+    protected $fields;
     /**
      * Create a new model.
      *
@@ -27,7 +29,7 @@ class MigrationCreator extends BaseMigrationCreator
         $this->ensureMigrationDoesntAlreadyExist($name);
 
         $path = $this->getPath($name, $path);
-        $stub = $this->files->get(resource_path('/generators/create.stub'));
+        $stub = $this->get_stub();
 
         $this->isCreate=$create;
         $this->files->put($path, $this->populateStub($name, $stub, $table));
@@ -49,9 +51,22 @@ class MigrationCreator extends BaseMigrationCreator
     protected function populateStub($name, $stub, $table)
     {
         $type=$this->isCreate?'create':'table';
+        if($this->isCreate){
+            //删除表
+            $down='Schema::dropIfExists('.$table.');';
+        }else{
+            //删除修改表的字段
+            $down="Schema::table('{$table}', function (Blueprint \$table) {\n";
+            foreach ($this->fields as $field){
+                if(!$field['change']){
+                    $down.="            \$table->dropColumn('{$field['field_name']}');\n";
+                }
+            }
+            $down.='        });';
+        }
         return str_replace(
-            ['DummyClass', 'DummyTable', 'DummyStructure','create'],
-            [$this->getClassName($name), $table, $this->bluePrint,$type],
+            ['DummyClass', 'DummyTable', 'DummyStructure','create','DummyDownTable'],
+            [$this->getClassName($name), $table, $this->bluePrint,$type,$down],
             $stub
         );
     }
@@ -68,7 +83,7 @@ class MigrationCreator extends BaseMigrationCreator
      *
      * @return $this
      */
-    public function buildBluePrint($fields = [], $keyName = 'id', $useTimestamps = true, $softDeletes = false)
+    public function buildBluePrint($fields = [], $keyName = 'id', $useTimestamps = true, $softDeletes = false,$foreigns=[])
     {
         $fields = array_filter($fields, function ($field) {
             return isset($field['field_name']) && !empty($field['field_name']) ;
@@ -78,11 +93,19 @@ class MigrationCreator extends BaseMigrationCreator
             throw new \Exception('Table fields can\'t be empty');
         }
 
+        //设置字段
+        $this->fields=$fields;
+
         if(isset($keyName)){
             $rows[] = "\$table->increments('$keyName');\n";
         }
         foreach ($fields as $k=>$field) {
-            $column = "\$table->{$field['type']}('{$field['field_name']}')";
+
+            if(isset($field['attach'])){
+                $column = "\$table->{$field['type']}('{$field['field_name']}',{$field['attach']})";
+            }else{
+                $column = "\$table->{$field['type']}('{$field['field_name']}')";
+            }
 
             if ($field['key']) {
                 $column .= "->{$field['key']}()";
@@ -113,8 +136,62 @@ class MigrationCreator extends BaseMigrationCreator
             $rows[] = "\$table->softDeletes();\n";
         }
 
+        //添加关联关系
+        if($foreigns){
+            $rows[] = "\n";
+            foreach ($foreigns as $foreign){
+                $onDelete='';
+                if($foreign['onDelete']){
+                    $onDelete="->onDelete({'{$foreign['onDelete']}'})";
+                }
+                $onUpdate='';
+                if($foreign['onUpdate']){
+                    $onUpdate="->onUpdate({'{$foreign['onUpdate']}'})";
+                }
+                $rows[] = "\$table->foreign('{$foreign['foreign']}')->references('{$foreign['references']}')->on('{$foreign['on']}'){$onDelete}{$onUpdate};\n";
+            }
+        }
+
         $this->bluePrint = trim(implode(str_repeat(' ', 12), $rows), "\n");
 
         return $this;
+    }
+
+    private function get_stub()
+    {
+        return <<<stub
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class DummyClass extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('DummyTable', function (Blueprint \$table) {
+            DummyStructure
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        DummyDownTable
+    }
+}
+
+stub;
+
     }
 }
