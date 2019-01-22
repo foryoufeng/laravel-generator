@@ -92,20 +92,20 @@
                 //模板列表
                 template_types:@json($template_types['datas']),
                 ruleForm: {
-                    modelName: '',
-                    modelDisplayName: '',
+                    modelName: 'User',
+                    modelDisplayName: 'a',
                     create:[
-                        'migration',
-                        'migrate',
-                        'ide-helper',
-                        'unittest'
+                        // 'migration',
+                        // 'migrate',
+                        // 'ide-helper',
+                        // 'unittest'
                     ],
                     primary_key:'id',
                     timestamps:true,
                     foreigns:[],
                     relationships:[],
                     table_fields:[{
-                        field_name:'',
+                        field_name:'name',
                         _display_name:'',
                         type:'string',
                         nullable:false,
@@ -149,7 +149,7 @@
                         { required: true, message: 'model @lang('laravel-generator::generator.required')', trigger: 'blur' },
                     ],
                     modelDisplayName: [
-                        { required: true, message: '@lang('laravel-generator::generator.modelDisplayName') @lang('laravel-generator::generator.required')', trigger: 'blur' },
+                        { required: true, message: '@lang('laravel-generator::generator.displayName') @lang('laravel-generator::generator.required')', trigger: 'blur' },
                     ],
                     tableName: [
                         { required: true, message: 'table name @lang('laravel-generator::generator.required')', trigger: 'blur' },
@@ -277,6 +277,7 @@
                  */
                 getTemplateCode(template,data){
                     var code=this.handleEnterKey(template);
+                    this.dummyValues['DummyDisplayName']=vm.ruleForm.modelDisplayName;
                     code=this.replaceDummyClass(code,this.dummyValues);
                     var temp=baidu.template(code, data);
                     var html=this.replaceAll(temp,"``","\n")
@@ -338,6 +339,15 @@
                         }
                         str=str.replace(new RegExp(this.dummyAttrs[index],"gm"),dummyValues[this.dummyAttrs[index]]);
                     }
+                    return this.replaceCustomDummy(str);
+                },
+                //替换自定义变量
+                replaceCustomDummy(str){
+                    var customDummys=@json($customDummys);
+                    for (var index in customDummys){
+                        console.log(index+'==>'+customDummys[index])
+                        str=str.replace(new RegExp(index,"gm"),customDummys[index]);
+                    }
                     return str;
                 },
                 //添加外键约束
@@ -395,8 +405,7 @@
                                     vm.$message.error(res.data.message);
                                 }
                             });
-                        })
-                        .catch(() => {});
+                        }).catch(() => {});
                 },
                 //提交generator表单
                 submitForm(formName) {
@@ -442,6 +451,10 @@
                                     vm.$message.error(res.data.message);
                                 }
                                 vm.loadding=false;
+                            }).catch((error) => {
+                                vm.loadding=false;
+                                console.log(error);
+                                alert(error);
                             });
                         } else {
                             return false;

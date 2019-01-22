@@ -2,7 +2,7 @@
 @section('content')
         <el-container style=" border: 1px solid #eee">
             <el-aside width="200px">
-                <el-menu :default-openeds="['1', '2']">
+                <el-menu :default-openeds="['1', '2','3']">
                     <el-submenu index="1">
                         <template slot="title"><i class="el-icon-tickets"></i>@{{ laravel_generators['className'] }}</template>
                         <el-menu-item-group>
@@ -89,6 +89,7 @@
                         </el-menu-item-group>
                         </el-submenu>
                     </el-submenu>
+                    {{--模型可用的操作方法--}}
                     <el-submenu index="2">
                         <template slot="title"><i class="el-icon-menu"></i>Model</template>
                         <el-menu-item-group>
@@ -130,6 +131,17 @@
                                     </el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
+                        </el-menu-item-group>
+                    </el-submenu>
+                    {{--自定义变量值--}}
+                    <el-submenu index="3">
+                        <template slot="title"><i class="el-icon-menu"></i>CustomDummys</template>
+                        <el-menu-item-group>
+                            @foreach($customDummys as $k=>$customDummy)
+                                <el-menu-item index="3-{{ $loop->index }}" @click="insertEditor('{{ $k }}')" >
+                                    {{ $k }}
+                                </el-menu-item>
+                            @endforeach
                         </el-menu-item-group>
                     </el-submenu>
                 </el-menu>
@@ -363,6 +375,14 @@
                           continue;
                       }
                       str=str.replace(new RegExp(this.dummyAttrs[index],"gm"),this.laravel_generators[index]);
+                  }
+                  return this.replaceCustomDummy(str);
+              },
+              //替换自定义变量
+              replaceCustomDummy(str){
+                  var customDummys=@json($customDummys);
+                  for (var index in customDummys){
+                      str=str.replace(new RegExp(index,"gm"),customDummys[index]);
                   }
                   return str;
               }

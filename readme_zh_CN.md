@@ -1,5 +1,9 @@
 # laravel-generator
 
+[![Latest Stable Version](https://poser.pugx.org/foryoufeng/laravel-generator/v/stable)](https://packagist.org/packages/foryoufeng/laravel-generator)
+[![Total Downloads](https://poser.pugx.org/foryoufeng/laravel-generator/downloads)](https://packagist.org/packages/foryoufeng/laravel-generator)
+[![License](https://poser.pugx.org/foryoufeng/laravel-generator/license)](https://packagist.org/packages/foryoufeng/laravel-generator)
+
 <p align="center">⛵<code>laravel-generator</code> 是一个为laravel应用快速生成代码的图形化界面代码生成器</p>
 
 要求

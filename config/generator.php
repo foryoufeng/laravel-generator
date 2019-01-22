@@ -20,4 +20,8 @@ return [
         'phone',
         'custom'
     ],
+    //difine your custom value
+    'customDummys'=>[
+        'DummyAuthor'=>env('DUMMY_AUTHOR','foryoufeng')
+    ]
 ];

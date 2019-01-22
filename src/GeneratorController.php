@@ -41,9 +41,11 @@ class GeneratorController extends BaseController
         $rules = $this->getRules();
         //可用的假属性字段
         $dummyAttrs = GeneratorUtils::getDummyAttrs();
+        //自定义变量
+        $customDummys=config('generator.customDummys');
 
         return view('laravel-generator::index', compact('dbTypes', 'generator',
-            'tab', 'template_types', 'dummyAttrs', 'tables', 'rules', 'modelInfo'));
+            'tab', 'template_types', 'dummyAttrs', 'tables', 'rules', 'modelInfo','customDummys'));
     }
 
     /**
@@ -104,26 +106,25 @@ class GeneratorController extends BaseController
                     $message = Artisan::output();
                     $paths['migrate'] = $message;
                 }
-                //3.是否运行idea代码提示
-                if (\in_array('ide-helper', $create, true)) {
-                    Artisan::call('ide-helper:models', ['--write' => true]);
-                    Artisan::output();
-                }
-                //4.是否运行 Create unit test.
+                //3.是否运行 Create unit test.
                 if (\in_array('unittest', $create, true)) {
                     Artisan::call('make:test', ['name' => $model_name.'Test', '--unit' => 'unit']);
                     $message = Artisan::output();
                     $paths['unit_test'] = $message;
                 }
-                //5.生成模板文件
+                //4.生成模板文件
                 $generator_templates = $data['generator_templates'];
                 foreach ($generator_templates as $k => $template) {
-                    $paths['files'.$k] = (new FileCreator($template['file_real_name'], $template['template']))->create();
+                    $paths['files-'.($k+1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
                 }
-                //6.处理关联关系
+                //5.处理关联关系
                 $relationships=$request->get('relationships');
                 $this->dealRelationShips($relationships,$model_name);
-
+                //6.是否运行idea代码提示
+                if (\in_array('ide-helper', $create, true)) {
+                    Artisan::call('ide-helper:models', ['--write' => true]);
+                    Artisan::output();
+                }
             }
 
             //新增加迁移文件

@@ -76,6 +76,45 @@
         }
         return this.replace(/^\s+|\s+$/g, '');
     };
+    /**
+     * get请求
+     * @method doGet
+     * @param url
+     * @param params
+     * @returns {Promise<any>}
+     */
+    Vue.prototype.doGet=function(url,params={}){
+        return new Promise((resolve,reject) => {
+            axios.get(url,{
+                params: params
+            }).then((res)=>{
+                if(res.status==200){
+                    resolve(res.data);
+                }
+                Vue.$message.error('wrong');
+            }).catch(function (error) {
+                reject(error);
+            });
+        });
+    }
+    /**
+     * post请求
+     * @param url
+     * @param params
+     * @returns {Promise<any>}
+     */
+    Vue.prototype.doPost=function(url,params={}){
+        return new Promise((resolve,reject) => {
+            axios.post(url,params).then((res)=>{
+                if(res.status==200){
+                    resolve(res.data);
+                }
+                Vue.$message.error('wrong');
+            }).catch(function (error) {
+                reject(error);
+            });
+        });
+    }
 </script>
 @yield('js')
 @yield('css')

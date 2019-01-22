@@ -53,7 +53,7 @@ class MigrationCreator extends BaseMigrationCreator
         $type=$this->isCreate?'create':'table';
         if($this->isCreate){
             //删除表
-            $down='Schema::dropIfExists('.$table.');';
+            $down="Schema::dropIfExists('{$table}');";
         }else{
             //删除修改表的字段
             $down="Schema::table('{$table}', function (Blueprint \$table) {\n";
@@ -141,12 +141,12 @@ class MigrationCreator extends BaseMigrationCreator
             $rows[] = "\n";
             foreach ($foreigns as $foreign){
                 $onDelete='';
-                if($foreign['onDelete']){
-                    $onDelete="->onDelete({'{$foreign['onDelete']}'})";
+                if(isset($foreign['onDelete']) && $foreign['onDelete']){
+                    $onDelete="->onDelete('{$foreign['onDelete']}')";
                 }
                 $onUpdate='';
-                if($foreign['onUpdate']){
-                    $onUpdate="->onUpdate({'{$foreign['onUpdate']}'})";
+                if(isset($foreign['onUpdate']) && $foreign['onUpdate']){
+                    $onUpdate="->onUpdate('{$foreign['onUpdate']}')";
                 }
                 $rows[] = "\$table->foreign('{$foreign['foreign']}')->references('{$foreign['references']}')->on('{$foreign['on']}'){$onDelete}{$onUpdate};\n";
             }

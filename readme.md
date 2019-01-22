@@ -1,5 +1,9 @@
 # laravel-generator
 
+[![Latest Stable Version](https://poser.pugx.org/foryoufeng/laravel-generator/v/stable)](https://packagist.org/packages/foryoufeng/laravel-generator)
+[![Total Downloads](https://poser.pugx.org/foryoufeng/laravel-generator/downloads)](https://packagist.org/packages/foryoufeng/laravel-generator)
+[![License](https://poser.pugx.org/foryoufeng/laravel-generator/license)](https://packagist.org/packages/foryoufeng/laravel-generator)
+
 ## [中文文档](readme_zh_CN.md)
 
 <p align="center">⛵<code>laravel-generator</code> is administrative interface builder for laravel which can help you build code template you want as soon as possiable.</p>
