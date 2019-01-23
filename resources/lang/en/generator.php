@@ -46,6 +46,7 @@ return [
      'modelNotDelete'=>'model is not allowed to delete',
      'name'=>'name',
      'add_time'=>'add time',
+     'file'=>'file',
      'submitError'=>'submit error',
      'submitSuccess'=>'submit success',
      'namespace'=>'namespace',

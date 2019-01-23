@@ -45,6 +45,7 @@ return [
     'modelNotDelete'=>'model 是不允许删除的',
     'name'=>'名称',
     'add_time'=>'添加时间',
+    'file'=>'文件',
     'submitError'=>'提交失败',
     'submitSuccess'=>'提交成功',
     'namespace'=>'命名空间',

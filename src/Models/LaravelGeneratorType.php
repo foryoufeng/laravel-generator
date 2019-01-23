@@ -12,6 +12,7 @@ class LaravelGeneratorType extends Model
     public const MODEL='Model';
     public const Controllers='Controllers';
     public const Views='Views';
+    public const Route='Route';
     /**
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

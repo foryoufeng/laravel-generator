@@ -16,13 +16,44 @@ class GeneratorSeeder extends Seeder
 {
     public function run()
     {
+        //添加模型
         $this->addModel();
-
+        //添加控制器
         $this->addControllers();
-
+        //添加视图
         $this->addViews();
+        //添加路由
+        $this->addRoute();
     }
 
+    private function addRoute()
+    {
+        $type = LaravelGeneratorType::firstOrCreate([
+            'name' => LaravelGeneratorType::Route,
+        ]);
+        $generator = LaravelGenerator::firstOrNew([
+            'name' => 'route',
+        ]);
+        if (!$generator->exists) {
+            $generator->path = 'routes/';
+            $generator->file_name = 'route_DummySnakeClass.php';
+            $generator->is_checked = 1;
+            $generator->template = $this->getRouteTemplate();
+            $generator->template_id = $type->id;
+            $generator->save();
+        }
+    }
+
+    private function getRouteTemplate()
+    {
+        return <<<stub
+<?php
+Route::get('DummySnakeClass','Home\DummyClassController@index')->name('home.DummySnakeClass.index');
+Route::match(['get', 'post'],'DummySnakeClass/update','Home\DummyClassController@update')->name('home.DummySnakeClass.update');
+Route::post('DummySnakeClass/delete','Home\DummyClassController@delete')->name('home.DummySnakeClass.delete');
+stub;
+
+    }
     /**
      * add Model.
      */
@@ -126,7 +157,7 @@ class DummyClassController extends Controller
         if(\$request->expectsJson()){
            \$name=\$request->get('content');
             \$title=\$request->get('title');
-            \$query=AppPush::orderByDesc('id');
+            \$query=DummyClass::orderByDesc('id');
             if(\$name){
                 \$query=\$query->where('content','like','%'.\$name.'%');
             }
@@ -161,7 +192,7 @@ class DummyClassController extends Controller
             ]);
 
             if(!\$DummySnakeClass){
-                \$DummySnakeClass=new AppPush();
+                \$DummySnakeClass=new DummyClass();
             }
             \$DummySnakeClass->fill(\$data);
             if(\$DummySnakeClass->save()){
@@ -293,10 +324,11 @@ stub;
              },
              methods: {
                  //加载列表数据
-                 getData(){
+                 getData(page=1){
+                     this.form.page=page;
                      this.loading=true;
                      //this.doGet is defined in the laravel-generator::layout
-                     this.doGet('{{ route('home.DummySnakeClass.index') }}',this.form).then(res => {
+                     this.doGet('{{ route(\'home.DummySnakeClass.index\') }}',this.form).then(res => {
                          if(res.errcode==0){
                              this.tableData=res.data.data;
                              this.setPageInfo(res.data);
@@ -312,8 +344,7 @@ stub;
                  },
                  //跳转分页的处理
                  handlePage(val){
-                     this.form.page=val;
-                     this.getData();
+                     this.getData(val);
                  },
                  //删除
                  handelDelete(id){
@@ -322,9 +353,8 @@ stub;
                          cancelButtonText: '取消',
                          type: 'warning'
                      }).then(() => {
-                         this.doPost('{{ route('home.DummySnakeClass.delete') }}',{id:id}).then(res => {
+                         this.doPost('{{ route(\'home.DummySnakeClass.delete\') }}',{id:id}).then(res => {
                              if(res.errcode==0){
-                                 this.form.page=1;
                                  this.getData();
                              }else{
                                  this.\$message.error(res.message);
@@ -361,7 +391,6 @@ stub;
                     <%if(item.rule=='string') { %>
                     <el-form-item label="<%=item.field_display_name%>" prop="<%=item.field_name%>">
                         <el-input v-model="form.<%=item.field_name%>"></el-input>
-                        <span>推送的标题</span>
                     </el-form-item>
                     <%}%>
                 <%}%>
@@ -385,8 +414,8 @@ stub;
                     rules: {
                         <%for(item of DummyTableFields){%>
                             <%if(item.rule=='string') { %>
-                                <%=item.field_name%>:[
-                                   { required: true, message: '<%=item.field_display_name%>', trigger: 'blur' },
+                                '<%=item.field_name%>':[
+                                   { required: true, message: '请输入<%=item.field_display_name%>', trigger: 'blur' },
                                 ],
                             <%}%>
                         <%}%>
@@ -398,11 +427,11 @@ stub;
                     this.\$refs[form].validate((valid) => {
                         if (valid) {
                             this.submitLoading=true;
-                            this.doPost('{{ route('home.DummySnakeClass.update') }}',this.form).then(res=>{
+                            this.doPost('{{ route(\'home.DummySnakeClass.update\') }}',this.form).then(res=>{
                                 this.submitLoading=false;
                                 if(res.errcode==0){
                                     this.\$message.success('操作成功!');
-                                    window.location.href='{{ route('home.DummySnakeClass.index') }}';
+                                    window.location.href='{{ route(\'home.DummySnakeClass.index\') }}';
                                 }else{
                                     this.\$message.error(res.msg);
                                 }
@@ -422,9 +451,6 @@ stub;
 
     </script>
 @endsection
-<style>
-
-</style>
 stub;
 
         return [

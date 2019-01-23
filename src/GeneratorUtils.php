@@ -233,6 +233,7 @@ public $timestamps = false;
                     'key' => '',
                     'is_show_lists' => true,
                     'can_search' => true,
+                    'rule'=>'string'
                 ],
                 [
                     'field_name' => 'name',
@@ -243,6 +244,7 @@ public $timestamps = false;
                     'key' => 'unique',
                     'is_show_lists' => true,
                     'can_search' => true,
+                    'rule'=>'string'
                 ],
                 [
                     'field_name' => 'add_time',
@@ -256,7 +258,7 @@ public $timestamps = false;
                 ],
                 [
                     'field_name' => 'upload_file',
-                    'field_display_name' => trans('laravel-generator::generator.add_time'),
+                    'field_display_name' => trans('laravel-generator::generator.file'),
                     'type' => 'string',
                     'nullable' => true,
                     'key' => '',

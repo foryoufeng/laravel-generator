@@ -78,6 +78,9 @@ return [
 
 <img src="https://cdn.linkgoup.com/laravel_generator_v2_zh.png" alt="laravel-generator">
 
+# 更多模板请查看下面的仓库
+[https://github.com/foryoufeng/generator-templates](https://github.com/foryoufeng/generator-templates)
+
 
 ## 注意
 
