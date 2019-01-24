@@ -328,7 +328,7 @@ stub;
                      this.form.page=page;
                      this.loading=true;
                      //this.doGet is defined in the laravel-generator::layout
-                     this.doGet('{{ route(\'home.DummySnakeClass.index\') }}',this.form).then(res => {
+                     this.doGet('{{ route('home.DummySnakeClass.index') }}',this.form).then(res => {
                          if(res.errcode==0){
                              this.tableData=res.data.data;
                              this.setPageInfo(res.data);
@@ -353,7 +353,7 @@ stub;
                          cancelButtonText: '取消',
                          type: 'warning'
                      }).then(() => {
-                         this.doPost('{{ route(\'home.DummySnakeClass.delete\') }}',{id:id}).then(res => {
+                         this.doPost('{{ route('home.DummySnakeClass.delete') }}',{id:id}).then(res => {
                              if(res.errcode==0){
                                  this.getData();
                              }else{
@@ -370,9 +370,6 @@ stub;
 
     </script>
 @endsection
-<style>
-
-</style>
 stub;
         $update_temp = <<<stub
 @extends('laravel-generator::layout')
@@ -410,13 +407,13 @@ stub;
 
                 return {
                     submitLoading:false,
-                    form: @json(\$DummySnakeClass),
+                    form:@json(\$DummySnakeClass),
                     rules: {
                         <%for(item of DummyTableFields){%>
                             <%if(item.rule=='string') { %>
-                                '<%=item.field_name%>':[
-                                   { required: true, message: '请输入<%=item.field_display_name%>', trigger: 'blur' },
-                                ],
+                        '<%=item.field_name%>':[
+                           { required: true, message: '请输入<%=item.field_display_name%>', trigger: 'blur' },
+                        ],
                             <%}%>
                         <%}%>
                     },
@@ -427,11 +424,11 @@ stub;
                     this.\$refs[form].validate((valid) => {
                         if (valid) {
                             this.submitLoading=true;
-                            this.doPost('{{ route(\'home.DummySnakeClass.update\') }}',this.form).then(res=>{
+                            this.doPost('{{ route('home.DummySnakeClass.update') }}',this.form).then(res=>{
                                 this.submitLoading=false;
                                 if(res.errcode==0){
                                     this.\$message.success('操作成功!');
-                                    window.location.href='{{ route(\'home.DummySnakeClass.index\') }}';
+                                    window.location.href='{{ route('home.DummySnakeClass.index') }}';
                                 }else{
                                     this.\$message.error(res.msg);
                                 }
@@ -466,8 +463,7 @@ stub;
      */
     private function getModelTemplate()
     {
-        return "
-<?php
+        return "<?php
 
 namespace App;
 
@@ -501,12 +497,12 @@ class DummyClass extends Model
 <%for(relationship of DummyRelationShips){%>
     <%if('hasMany'==relationship.relationship) { %>
      public function <%=relationship.snake_plural_model%>(){
-         return \$this->hasMany(<%=relationship.model%>::class <%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
+         return \$this->hasMany(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
      }
      
     <%}else{%>
      public function <%=relationship.snake_model%>(){
-         return \$this-><%=relationship.relationship%>(<%=relationship.model%>::class <%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
+         return \$this-><%=relationship.relationship%>(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
      }
 
     <%}%>

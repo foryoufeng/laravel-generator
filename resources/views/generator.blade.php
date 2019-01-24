@@ -71,7 +71,7 @@
                     <el-input v-model="table.field_name" placeholder="field name"></el-input>
                 </el-col>
                 <el-col :span="2" style="margin-left: 10px">
-                    <el-input v-model="table.display_name" placeholder="@lang('laravel-generator::generator.displayName')"></el-input>
+                    <el-input v-model="table.field_display_name" placeholder="@lang('laravel-generator::generator.displayName')"></el-input>
                 </el-col>
                 <el-col :span="2" style="margin-left: 10px">
                     <el-select v-model="table.type" placeholder="please select"  filterable >

@@ -92,21 +92,21 @@
                 //模板列表
                 template_types:@json($template_types['datas']),
                 ruleForm: {
-                    modelName: 'User',
-                    modelDisplayName: 'a',
+                    modelName: '',
+                    modelDisplayName: '',
                     create:[
-                        // 'migration',
-                        // 'migrate',
-                        // 'ide-helper',
-                        // 'unittest'
+                        'migration',
+                        'migrate',
+                        'ide-helper',
+                        'unittest'
                     ],
                     primary_key:'id',
                     timestamps:true,
                     foreigns:[],
                     relationships:[],
                     table_fields:[{
-                        field_name:'name',
-                        _display_name:'',
+                        field_name:'',
+                        field_display_name:'',
                         type:'string',
                         nullable:false,
                         is_show_lists:true,
@@ -465,7 +465,7 @@
                 addTable(){
                     this.ruleForm.table_fields.push({
                         field_name:'',
-                        _display_name:'',
+                        field_display_name:'',
                         searchable:false,
                         type:'string',
                         is_show_lists:true,
@@ -484,7 +484,7 @@
                 addMigrateTable(){
                     this.migrateForm.table_fields.push({
                         field_name:'',
-                        _display_name:'',
+                        field_display_name:'',
                         searchable:false,
                         type:'string',
                         nullable:false,

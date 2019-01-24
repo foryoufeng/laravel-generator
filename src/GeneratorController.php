@@ -123,7 +123,6 @@ class GeneratorController extends BaseController
                 //6.是否运行idea代码提示
                 if (\in_array('ide-helper', $create, true)) {
                     Artisan::call('ide-helper:models', ['--write' => true]);
-                    Artisan::output();
                 }
             }
 

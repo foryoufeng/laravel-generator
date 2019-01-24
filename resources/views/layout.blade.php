@@ -78,7 +78,6 @@
     };
     /**
      * get请求
-     * @method doGet
      * @param url
      * @param params
      * @returns {Promise<any>}

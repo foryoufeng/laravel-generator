@@ -69,5 +69,5 @@ return [
      'SnakeClassNameDesc'=>'will be replaced to snake_case such as laravel_generator',
      'PluralClassNameDesc'=>'will be replaced to its plural form,currently only supports the English language such as LaravelGenerators',
      'SnakePluralClassNameDesc'=>'will be replaced to snake and then to its plural form such as laravel_generators',
-     'templateError'=>"<p class='margin_top'>模板语法错误！常见错误：</p><p class='margin_top'>1.'<%'和'%>'要成对出现，不可只用其一！</p><p class='margin_top'>2.语法错误。可参考<a href='http://wangxiao.github.io/BaiduTemplate/' target='_blank'>百度模板引擎使用手册</a>。"
+     'templateError'=>"<p class='margin_top'>Template syntax error！common errors：</p><p class='margin_top'>1.'<%'和'%>'To come in pairs, you can't just use one！</p><p class='margin_top'>2.syntax error .can refer to<a href='http://wangxiao.github.io/BaiduTemplate/' target='_blank'>BaiduTemplate</a>。"
 ];
