@@ -368,7 +368,7 @@
                     this.isShowRelationship=true;
                     this.ruleForm.relationships.push({
                         relationship:'belongsTo',
-                        model:'UserLog',
+                        model:'',
                         foreign_key:'',
                         reverse:'',
                     });

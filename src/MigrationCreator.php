@@ -34,8 +34,6 @@ class MigrationCreator extends BaseMigrationCreator
         $this->isCreate=$create;
         $this->files->put($path, $this->populateStub($name, $stub, $table));
 
-        $this->firePostCreateHooks();
-
         return $path;
     }
 
