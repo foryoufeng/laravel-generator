@@ -36,6 +36,12 @@ Then run the command to install the generator
 php artisan generator:install
 ```
 
+you may also need install the package `barryvdh/laravel-ide-helper`,if you do not install it
+
+```
+composer require --dev barryvdh/laravel-ide-helper
+```
+
 After run command you can find config file in `config/generator.php`,and now you can access your application `http://yourhost/generator` to use the `laravel-generator`
 
 After the installation is complete, the project generates templates such as model, controllers and views by default. Other templates can be added or modified according to the actual needs of the project.

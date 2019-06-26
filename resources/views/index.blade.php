@@ -409,6 +409,16 @@
                 },
                 //提交generator表单
                 submitForm(formName) {
+                    let primary_key=this.ruleForm.primary_key;
+                    //防止添加字段和主键重复
+                    let fieldFlag=this.ruleForm.table_fields.find(function(item){
+                        return item.field_name==primary_key
+                    });
+                    if(fieldFlag){
+                        let message='primary_key: '+primary_key+'@lang('laravel-generator::generator.hasExists') '+'@lang('laravel-generator::generator.delete')' +'@lang('laravel-generator::generator.fieldName')(Field name) '+primary_key
+                        this.$message.error(message);
+                        return;
+                    }
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             //获取选中的模板
@@ -488,6 +498,7 @@
                         searchable:false,
                         type:'string',
                         nullable:false,
+                        change:false,
                         key:'',
                         default:'',
                         comment:''

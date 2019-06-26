@@ -54,6 +54,7 @@ return [
     'tableFields'=>'表字段',
     'required'=>'是必须的',
     'ifNotExit'=>'如果不存着可以添加 ',
+    'hasExists'=>'已经存在',
     'submit'=>'提交',
     'classInfo'=>'类信息',
     'className'=>'类',

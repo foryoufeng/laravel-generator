@@ -11,9 +11,10 @@ class MigrationCreator extends BaseMigrationCreator
      */
     protected $bluePrint = '';
 
-    protected $isCreate=true;
+    protected $isCreate = true;
 
     protected $fields;
+
     /**
      * Create a new model.
      *
@@ -31,42 +32,10 @@ class MigrationCreator extends BaseMigrationCreator
         $path = $this->getPath($name, $path);
         $stub = $this->get_stub();
 
-        $this->isCreate=$create;
+        $this->isCreate = $create;
         $this->files->put($path, $this->populateStub($name, $stub, $table));
 
         return $path;
-    }
-
-    /**
-     * Populate stub.
-     *
-     * @param string $name
-     * @param string $stub
-     * @param string $table
-     *
-     * @return mixed
-     */
-    protected function populateStub($name, $stub, $table)
-    {
-        $type=$this->isCreate?'create':'table';
-        if($this->isCreate){
-            //删除表
-            $down="Schema::dropIfExists('{$table}');";
-        }else{
-            //删除修改表的字段
-            $down="Schema::table('{$table}', function (Blueprint \$table) {\n";
-            foreach ($this->fields as $field){
-                if(!$field['change']){
-                    $down.="            \$table->dropColumn('{$field['field_name']}');\n";
-                }
-            }
-            $down.='        });';
-        }
-        return str_replace(
-            ['DummyClass', 'DummyTable', 'DummyStructure','create','DummyDownTable'],
-            [$this->getClassName($name), $table, $this->bluePrint,$type,$down],
-            $stub
-        );
     }
 
     /**
@@ -81,10 +50,10 @@ class MigrationCreator extends BaseMigrationCreator
      *
      * @return $this
      */
-    public function buildBluePrint($fields = [], $keyName = 'id', $useTimestamps = true, $softDeletes = false,$foreigns=[])
+    public function buildBluePrint($fields = [], $keyName = 'id', $useTimestamps = true, $softDeletes = false, $foreigns = [])
     {
         $fields = array_filter($fields, function ($field) {
-            return isset($field['field_name']) && !empty($field['field_name']) ;
+            return isset($field['field_name']) && !empty($field['field_name']);
         });
 
         if (empty($fields)) {
@@ -92,16 +61,15 @@ class MigrationCreator extends BaseMigrationCreator
         }
 
         //设置字段
-        $this->fields=$fields;
-
-        if(isset($keyName)){
+        $this->fields = $fields;
+        $rows = [];
+        if (isset($keyName)) {
             $rows[] = "\$table->increments('$keyName');\n";
         }
-        foreach ($fields as $k=>$field) {
-
-            if(isset($field['attach'])){
+        foreach ($fields as $k => $field) {
+            if (isset($field['attach'])) {
                 $column = "\$table->{$field['type']}('{$field['field_name']}',{$field['attach']})";
-            }else{
+            } else {
                 $column = "\$table->{$field['type']}('{$field['field_name']}')";
             }
 
@@ -117,11 +85,11 @@ class MigrationCreator extends BaseMigrationCreator
                 $column .= "->comment('{$field['comment']}')";
             }
 
-            if (array_get($field, 'nullable')) {
+            if (isset($field['nullable']) && $field['nullable']) {
                 $column .= '->nullable()';
             }
             if (isset($field['change']) && $field['change']) {
-                $column .= "->change()";
+                $column .= '->change()';
             }
             $rows[] = $column.";\n";
         }
@@ -135,16 +103,16 @@ class MigrationCreator extends BaseMigrationCreator
         }
 
         //添加关联关系
-        if($foreigns){
+        if ($foreigns) {
             $rows[] = "\n";
-            foreach ($foreigns as $foreign){
-                $onDelete='';
-                if(isset($foreign['onDelete']) && $foreign['onDelete']){
-                    $onDelete="->onDelete('{$foreign['onDelete']}')";
+            foreach ($foreigns as $foreign) {
+                $onDelete = '';
+                if (isset($foreign['onDelete']) && $foreign['onDelete']) {
+                    $onDelete = "->onDelete('{$foreign['onDelete']}')";
                 }
-                $onUpdate='';
-                if(isset($foreign['onUpdate']) && $foreign['onUpdate']){
-                    $onUpdate="->onUpdate('{$foreign['onUpdate']}')";
+                $onUpdate = '';
+                if (isset($foreign['onUpdate']) && $foreign['onUpdate']) {
+                    $onUpdate = "->onUpdate('{$foreign['onUpdate']}')";
                 }
                 $rows[] = "\$table->foreign('{$foreign['foreign']}')->references('{$foreign['references']}')->on('{$foreign['on']}'){$onDelete}{$onUpdate};\n";
             }
@@ -153,6 +121,39 @@ class MigrationCreator extends BaseMigrationCreator
         $this->bluePrint = trim(implode(str_repeat(' ', 12), $rows), "\n");
 
         return $this;
+    }
+
+    /**
+     * Populate stub.
+     *
+     * @param string $name
+     * @param string $stub
+     * @param string $table
+     *
+     * @return mixed
+     */
+    protected function populateStub($name, $stub, $table)
+    {
+        $type = $this->isCreate ? 'create' : 'table';
+        if ($this->isCreate) {
+            //删除表
+            $down = "Schema::dropIfExists('{$table}');";
+        } else {
+            //删除修改表的字段
+            $down = "Schema::table('{$table}', function (Blueprint \$table) {\n";
+            foreach ($this->fields as $field) {
+                if (!$field['change']) {
+                    $down .= "            \$table->dropColumn('{$field['field_name']}');\n";
+                }
+            }
+            $down .= '        });';
+        }
+
+        return str_replace(
+            ['DummyClass', 'DummyTable', 'DummyStructure', 'create', 'DummyDownTable'],
+            [$this->getClassName($name), $table, $this->bluePrint, $type, $down],
+            $stub
+        );
     }
 
     private function get_stub()
@@ -190,6 +191,5 @@ class DummyClass extends Migration
 }
 
 stub;
-
     }
 }

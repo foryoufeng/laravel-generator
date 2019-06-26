@@ -55,6 +55,7 @@ return [
      'tableFields'=>'Table Fields',
      'required'=>'is required',
      'ifNotExit'=>'can add if not exist ',
+     'hasExists'=>'already exists',
      'submit'=>'Submit',
      'classInfo'=>'Class Info',
      'className'=>'Class',

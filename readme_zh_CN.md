@@ -36,6 +36,12 @@ Foryoufeng\Generator\GeneratorServiceProvider::class
 php artisan generator:install
 ```
 
+你可能也需要安装这个包 `barryvdh/laravel-ide-helper`,如果你没有安装它的话，可以运行下面的命令进行安装
+
+```
+composer require --dev barryvdh/laravel-ide-helper
+```
+
 运行后，你能在`config/generator.php`中配置你的代码
 
 现在你可以访问你的应用url`http://yourhost/generator` 来使用`laravel-generator`了

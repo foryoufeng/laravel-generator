@@ -18,6 +18,12 @@
                 <el-col :span="2">Field name</el-col>
 
                 <el-col :span="3" style="margin-left: 20px">Type</el-col>
+                <el-col :span="2">
+                    <el-popover placement="top-start" trigger="hover">
+                        <p>@lang('laravel-generator::generator.youNeed')<el-tag type="success">$table->decimal('amount', 5, 2)</el-tag>,@lang('laravel-generator::generator.soAttach')</p>
+                        <span slot="reference">attach<i class="el-icon-question"></i></span>
+                    </el-popover>
+                </el-col>
                 <el-col :span="1">Nullable</el-col>
                 <el-col :span="3">Key</el-col>
                 <el-col :span="3" style="margin-left: 20px">Default value</el-col>
@@ -38,6 +44,9 @@
                                 :value="item.value">
                         </el-option>
                     </el-select>
+                </el-col>
+                <el-col :span="2">
+                    <el-input v-model="table.attach" placeholder="attach"></el-input>
                 </el-col>
                 <el-col :span="1">
                     <el-checkbox v-model="table.nullable" style="margin-left: 20px"></el-checkbox>
