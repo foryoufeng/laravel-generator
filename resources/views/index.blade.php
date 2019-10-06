@@ -464,7 +464,7 @@
                             }).catch((error) => {
                                 vm.loadding=false;
                                 console.log(error);
-                                alert(error);
+                                vm.$message.error(error);
                             });
                         } else {
                             return false;

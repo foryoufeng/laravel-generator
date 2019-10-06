@@ -16,7 +16,7 @@ Requirements
  # For GUI
 <img src="https://cdn.linkgoup.com/laravel_generator_v2_en_index.png" alt="laravel-generator">
 
-## [More Docs](https://doc.linkgoup.com/docs/show/669)
+## [More Docs](https://learnku.com/index.php/docs/laravel-generator-en)
 
 ## Installation
 

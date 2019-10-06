@@ -14,7 +14,7 @@
  # UI界面
 <img src="https://cdn.linkgoup.com/laravel_generator_zh_index.png" alt="laravel-generator">
 
-## [更多文档](https://doc.linkgoup.com/docs/show/669)
+## [更多文档](https://learnku.com/index.php/docs/laravel-generator)
 
 ## 安装
 
