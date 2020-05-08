@@ -92,7 +92,7 @@ class GeneratorController extends BaseController
                     $table_name = Str::plural(Str::snake(class_basename($model_name)));
                     $migrationName = 'create_'.$table_name.'_table';
 
-                    $paths['migration'] = (new MigrationCreator(app('files')))->buildBluePrint(
+                    $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint(
                         $table_fields,
                         $request->get('primary_key', 'id'),
                         $request->get('timestamps'),
