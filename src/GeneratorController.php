@@ -74,7 +74,8 @@ class GeneratorController extends BaseController
     public function store(Request $request)
     {
         $paths = [];
-
+        //获取模型的信息
+        $modelInfo = $this->getModelInfo();
         try {
             $doMigrate = $request->get('doMigrate', []);
             $table_fields = $request->get('table_fields');
@@ -119,10 +120,15 @@ class GeneratorController extends BaseController
                 }
                 //5.处理关联关系
                 $relationships=$request->get('relationships');
-                $this->dealRelationShips($relationships,$model_name);
+                $this->dealRelationShips($relationships,$model_name,$modelInfo);
                 //6.是否运行idea代码提示
                 if (\in_array('ide-helper', $create, true)) {
-                    Artisan::call('ide-helper:models', ['--write' => true]);
+                    Artisan::call('ide-helper:models', [
+                        '--write' => true,
+                        'model'=>[
+                            ucfirst(str_replace('/','\\',$modelInfo->path).$model_name)
+                        ]
+                    ]);
                 }
             }
 
@@ -152,11 +158,9 @@ class GeneratorController extends BaseController
         return $this->success($paths);
     }
 
-    private function dealRelationShips($relationships,$model_name)
+    private function dealRelationShips($relationships,$model_name,$modelInfo)
     {
         if($relationships){
-            //获取模型的信息
-            $modelInfo = $this->getModelInfo();
             foreach ($relationships as $relationship){
                 //替换相对模型的数据
                 $file_name=base_path($modelInfo->path).$relationship['model'].'.php';

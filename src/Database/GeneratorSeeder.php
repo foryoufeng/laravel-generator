@@ -141,7 +141,7 @@ stub;
 
 namespace App\Http\Controllers\Home;
 
-use App\DummyClass;
+use App\Models\DummyClass;
 use Illuminate\Http\Request;
 use Foryoufeng\Generator\Message;
 use App\Http\Controllers\Controller;
@@ -150,8 +150,7 @@ use App\Http\Controllers\Controller;
  */
 class DummyClassController extends Controller
 {
-    use Message;
-    
+
     public function index(Request \$request)
     {
         if(\$request->expectsJson()){
@@ -164,7 +163,8 @@ class DummyClassController extends Controller
             if(\$title){
                 \$query=\$query->where('title','like','%'.\$title.'%');
             }
-            return \$this->success(\$query->paginate()->toArray());
+
+            return response()->json(['message' => 'success', 'errcode' => 0, 'data' => \$query->paginate()->toArray()]);
         }
         return view('home.DummySnakeClass.index');
     }
@@ -177,7 +177,7 @@ class DummyClassController extends Controller
             'item'=>\$DummySnakeClass
         ]);
     }
-    
+
     public function update(Request \$request)
     {
         \$id=(int)\$request->get('id');
@@ -196,9 +196,9 @@ class DummyClassController extends Controller
             }
             \$DummySnakeClass->fill(\$data);
             if(\$DummySnakeClass->save()){
-                return \$this->success('保存成功');
+                return response()->json(['message' => '保存成功', 'errcode' => 0, 'data' => []]);
             }
-            return \$this->error('保存失败');
+            return response()->json(['message' => '保存失败', 'errcode' => 1, 'data' => []]);
         }
 
         if(!\$DummySnakeClass){
@@ -209,15 +209,15 @@ class DummyClassController extends Controller
         }
         return view('home.DummySnakeClass.update',compact('DummySnakeClass'));
     }
-    
+
     public function delete(Request \$request)
     {
         \$id=(int)\$request->get('id');
         \$DummySnakeClass=DummyClass::whereId(\$id)->first();
         if(\$DummySnakeClass && \$DummySnakeClass->delete()){
-            return \$this->success('删除成功');
+            return response()->json(['message' => '删除成功', 'errcode' => 0, 'data' => []]);
         }
-        return \$this->error('删除失败');
+        return response()->json(['message' => '删除失败', 'errcode' => 1, 'data' => []]);
     }
 }
 stub;
@@ -465,7 +465,7 @@ stub;
     {
         return "<?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 <%* soft delete *%>
@@ -499,7 +499,7 @@ class DummyClass extends Model
      public function <%=relationship.snake_plural_model%>(){
          return \$this->hasMany(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
      }
-     
+
     <%}else{%>
      public function <%=relationship.snake_model%>(){
          return \$this-><%=relationship.relationship%>(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);

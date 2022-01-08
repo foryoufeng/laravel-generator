@@ -458,7 +458,14 @@
                                         duration:5000
                                     });
                                 }else{
-                                    vm.$message.error(res.data.message);
+                                    vm.$message({
+                                        title: 'error',
+                                        dangerouslyUseHTMLString: true,
+                                        message: 'aa',
+                                        center: true,
+                                        type: 'error',
+                                        duration:8000
+                                    });
                                 }
                                 vm.loadding=false;
                             }).catch((error) => {
@@ -529,7 +536,14 @@
                                         duration:5000
                                     });
                                 }else{
-                                    vm.$message.error(res.data.message);
+                                    vm.$message({
+                                        title: 'error',
+                                        dangerouslyUseHTMLString: true,
+                                        message: res.data.message,
+                                        center: true,
+                                        type: 'error',
+                                        duration:8000
+                                    });
                                 }
                                 vm.loadding=false;
                             });
