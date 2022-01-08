@@ -14,7 +14,7 @@ Requirements
  - Laravel >= 5
  
  # For GUI
-<img src="https://cdn.linkgoup.com/laravel_generator_v2_en_index.png" alt="laravel-generator">
+<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/K55cxJl5LK.png!large" alt="laravel-generator">
 
 ## [More Docs](https://learnku.com/index.php/docs/laravel-generator-en)
 
@@ -48,7 +48,7 @@ After the installation is complete, the project generates templates such as mode
 
 ## templates
 
-<img src="https://cdn.linkgoup.com/laravel_generator_en_template.png" alt="laravel-generator">
+<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/LUIuNgsgNC.png!large" alt="laravel-generator">
  
 ## Usage
 the `generator.php` doc

@@ -12,7 +12,7 @@
  - Laravel >= 5
  
  # UI界面
-<img src="https://cdn.linkgoup.com/laravel_generator_zh_index.png" alt="laravel-generator">
+<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/K55cxJl5LK.png!large" alt="laravel-generator">
 
 ## [更多文档](https://learnku.com/index.php/docs/laravel-generator)
 
@@ -50,7 +50,7 @@ composer require --dev barryvdh/laravel-ide-helper
 
 ## 模板
 
-<img src="https://cdn.linkgoup.com/laravel_generator_zh_template.png" alt="laravel-generator">
+<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/t9TQsazd9x.png!large" alt="laravel-generator">
   
 ## 用法
 `generator.php` 文件说明
