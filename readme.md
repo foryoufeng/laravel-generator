@@ -77,14 +77,6 @@ return [
 ];
 ```
 
-## stub
-You can define the format of the stub you need followed by my rules,such as
-
-<img src="https://cdn.linkgoup.com/laravel_generator_v2_en.png" alt="laravel-generator">
-
-# more stub
-[https://github.com/foryoufeng/generator-templates](https://github.com/foryoufeng/generator-templates)
-
 ## Notice
 
 Only Chinese and English are supported by laravel generator now 
