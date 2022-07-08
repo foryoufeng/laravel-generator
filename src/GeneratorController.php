@@ -142,7 +142,7 @@ class GeneratorController extends BaseController
                     $migrationName .= collect($table_fields)->pluck('field_name')->implode('_');
                 }
                 $migrationName .= '_'.$tableName.'_table';
-                $paths['migration'] = (new MigrationCreator(app('files')))->buildBluePrint($table_fields, null, false)
+                $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint($table_fields, null, false)
                     ->create($migrationName, database_path('migrations'), $tableName, false);
                 //  Run migrate.
                 if (\in_array('migrate', $request->get('doMigrate'),true)) {

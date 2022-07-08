@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-generator` will be documented in this file.
 
+* # Version 2.6
+    * add Laravel 9.0 support  / 增加对Laravel 9.0 的支持
+    * fix the add create:migrate bug / 修复创建迁移文件报错bug
+    * fix the change migrate bug / 修复修改migrate表结构字段报错的bug
+---
+
 * # Version 2.1
   * add Laravel 6.0 support  / 增加对Laravel 6.0 的支持
   * fix the primary key add bug / 修复新增字段为主键时引起的报错bug
@@ -16,7 +22,7 @@ All notable changes to `laravel-generator` will be documented in this file.
   * add Foreign and Relationships / 增加外键和关联关系
   * add some fields such as display name and rule and so on /新增显示名称、规则等字段 
 ---
-* #Version 1.0
+* # Version 1.0
 
 ### Added
 - Everything / 第一个版本

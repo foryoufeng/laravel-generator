@@ -33,7 +33,7 @@ class MigrationCreator extends BaseMigrationCreator
         $stub = $this->get_stub();
 
         $this->isCreate = $create;
-        $this->files->put($path, $this->populateStub($name, $stub, $table));
+        $this->files->put($path, $this->replaceStub($name, $stub, $table));
 
         return $path;
     }
@@ -132,7 +132,7 @@ class MigrationCreator extends BaseMigrationCreator
      *
      * @return mixed
      */
-    protected function populateStub($name, $stub, $table)
+    protected function replaceStub($name, $stub, $table)
     {
         $type = $this->isCreate ? 'create' : 'table';
         if ($this->isCreate) {

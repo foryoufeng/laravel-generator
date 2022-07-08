@@ -143,7 +143,6 @@ namespace App\Http\Controllers\Home;
 
 use App\Models\DummyClass;
 use Illuminate\Http\Request;
-use Foryoufeng\Generator\Message;
 use App\Http\Controllers\Controller;
 /**
  * DummyDisplayName
