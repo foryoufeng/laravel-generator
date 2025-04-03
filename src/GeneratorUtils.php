@@ -25,7 +25,7 @@ class GeneratorUtils
     public static function getTables()
     {
         $info = [];
-        $tables = DB::select('show tables');
+        $tables = Schema::getConnection()->getSchemaBuilder()->getTables();
         $database = DB::getConfig('database');
         $prefix = DB::getConfig('prefix');
         $tables = array_column($tables, 'Tables_in_'.$database);
@@ -128,19 +128,19 @@ class GeneratorUtils
 
 <%}else{%>
 
-<h2>is else</h2>   
+<h2>is else</h2>
 
 <%}%>',
             //the elseif
-            'elseif' => '<%if(false) { %> 
+            'elseif' => '<%if(false) { %>
 
 <%}else if(1==1){%>
 
 else if
 <%}else{%>
 
-<h2>is else</h2>  
- 
+<h2>is else</h2>
+
 <%}%>',
             //the for
             'for' => '<%for(var i=0;i<10;i++){%>

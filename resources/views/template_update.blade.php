@@ -223,14 +223,14 @@
                                     <el-button type="success" @click="insertFunction('rule')" size="small" round><span style="font-size: 14px">rule</span></el-button>
                                     <el-button type="success" @click="insertFunction('relationships')" size="small" round><span style="font-size: 14px">relationships</span></el-button>
                                 </div>
-                                <el-button type="danger" class="subButton" @click="submitForm('form')" :disabled="submitDisabled">
-                                    @lang('laravel-generator::generator.submit')
-                                </el-button>
                         </el-row>
-                        <el-row type="flex" style="margin-top: 5px">
+                        <el-row type="flex" style="margin-top: 5px;margin-bottom: 15px">
                                 <div id="container" style="width:45%;min-width:600px;height:600px;border:1px solid grey;float: left;margin-right: 10px"></div>
                                 <div id="containerShow" style="width:45%;min-width:600px;height:600px;border:1px solid grey;float: left"></div>
                         </el-row>
+                        <el-button type="danger" class="subButton" @click="submitForm('form')" :disabled="submitDisabled">
+                            @lang('laravel-generator::generator.submit')
+                        </el-button>
                     </el-form>
                 </el-main>
 
@@ -242,7 +242,6 @@
      .subButton{
          width: 150px;
          height: 50px;
-         margin-left: 166px;
      }
      .margin_top{
          padding: 10px;
