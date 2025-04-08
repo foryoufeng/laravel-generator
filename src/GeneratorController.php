@@ -95,7 +95,7 @@ class GeneratorController extends BaseController
 
                     $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint(
                         $table_fields,
-                        $request->get('primary_key', 'id'),
+                        'id',
                         $request->get('timestamps'),
                         $request->get('soft_deletes'),
                         $request->get('foreigns')

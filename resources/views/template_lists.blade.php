@@ -15,7 +15,7 @@
                         :value="item.value">
                 </el-option>
             </el-select>
-            <el-button type="success" @click="getData()" icon="el-icon-search" style="float: left;margin-left: 10px"></el-button>
+            <el-button type="primary" @click="getData()" icon="el-icon-search" style="float: left;margin-left: 10px"></el-button>
             <a href="{{ route('generator.template.update') }}" target="_blank">
                 <el-button type="danger" icon="el-icon-plus" style="float: left;margin-left: 10px">{{ trans('laravel-generator::generator.add') }}</el-button>
             </a>

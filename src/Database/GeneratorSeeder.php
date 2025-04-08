@@ -66,7 +66,7 @@ stub;
             'name' => 'model',
         ]);
         if (!$generator->exists) {
-            $generator->path = 'app/';
+            $generator->path = 'app/Models';
             $generator->file_name = 'DummyClass.php';
             $generator->is_checked = 1;
             $generator->template = $this->getModelTemplate();

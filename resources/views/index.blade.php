@@ -19,6 +19,11 @@
         .margin_top{
             padding: 10px;
         }
+        #files .el-input__inner {
+            width: auto;
+            width: 450px; /* 设置最小宽度 */
+            padding: 4px;
+        }
     </style>
 @endsection
 @section('js')
