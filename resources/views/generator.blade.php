@@ -294,7 +294,7 @@
         {{--    添加关联关系/end     --}}
 
         <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" :loading="loadding">submit</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm')" :loading="loadding">@lang('laravel-generator::generator.submit')</el-button>
         </el-form-item>
 
     </el-form>

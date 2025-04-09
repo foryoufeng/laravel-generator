@@ -12,4 +12,5 @@ Route::namespace('Foryoufeng\Generator')->group(function () {
     Route::get($route.'template/update', 'GeneratorTemplateController@update')->name('generator.template.update');
     Route::post($route.'template/save', 'GeneratorTemplateController@save')->name('generator.template.save');
     Route::post($route.'template/delete', 'GeneratorTemplateController@delete')->name('generator.template.delete');
+    Route::post($route.'template/updateType', 'GeneratorTemplateController@updateType')->name('generator.template.updateType');
 });

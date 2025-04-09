@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Illuminate\Routing\Controller as BaseController;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
+use Illuminate\Validation\Rule;
 
 /**
  * Class GeneratorTemplateController.
@@ -100,6 +101,20 @@ class GeneratorTemplateController extends BaseController
         return $this->error(trans('laravel-generator::generator.deleteFailed'));
     }
 
+    public function updateType(Request $request)
+    {
+        $name = $request->get('name');
+        $id = $request->get('id');
+        if($id>0){
+            $generator_type = LaravelGeneratorType::whereId($id)->first();
+        }else{
+            $generator_type = new LaravelGeneratorType();
+        }
+        $generator_type->name = $name;
+        $generator_type->save();
+
+        return $this->success($generator_type->toArray());
+    }
     /**
      * 保存数据.
      *
@@ -112,20 +127,16 @@ class GeneratorTemplateController extends BaseController
         $data = $request->validate([
             'id' => 'required|int',
             'name' => 'required',
-            'template_id' => 'required',
+            'template_id' => [
+                'required',
+                'integer',
+                Rule::exists('laravel_generator_types', 'id'),
+            ],
             'is_checked' => 'required|boolean',
             'path' => 'required',
             'file_name' => 'required',
             'template' => 'required',
         ]);
-        $template_id = $data['template_id'];
-        $generator_type = LaravelGeneratorType::find($template_id);
-        if (!$generator_type) {
-            $generator_type = LaravelGeneratorType::firstOrCreate([
-                'name' => $template_id,
-            ]);
-            $data['template_id'] = $generator_type->id;
-        }
         if (!$data['id']) {
             $generator = new LaravelGenerator();
         } else {

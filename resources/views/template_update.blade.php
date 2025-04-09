@@ -164,28 +164,29 @@
                                                placeholder="@lang('laravel-generator::generator.group')"
                                                no-data-text="@lang('laravel-generator::generator.noData')"
                                                @visible-change="visibleChange"
-                                               @change="selectChange()">
+                                               @change="selectChange()" class="group-select">
                                         <el-option class="options"
                                                 v-show="!labelsVisible"
-                                                v-for="item in template_types"
+                                                v-for="(item,index) in template_types"
                                                 :key="item.value"
                                                 :label="item.label"
                                                 :value="item.value">
                                             <span style="float: left">@{{ item.label }}</span>
-                                            <span style="float: right; color: #8492a6; font-size: 13px" class="delete-icon"><i class="el-icon-delete" @click.prevent.stop="deleteItem(item.value)"></i></span>
+                                            <span style="float: right; color: #8492a6; font-size: 13px" class="delete-icon"><i class="el-icon-edit" @click.prevent.stop="showForm(item.value,index)"></i></span>
                                         </el-option>
                                         <div class="selectLabels s_flex fd-cl ai_ct" v-show="labelsVisible" style="margin-top: 10px;">
                                             <div style="width: 100%;margin-bottom: 10px">
                                                 <em class="iconfont icon-flow" style="cursor: pointer;" @click="labelsVisible = false"></em>
-                                                <span>@lang('laravel-generator::generator.add')</span>
+                                                <span v-if="labelForm.id>0">@lang('laravel-generator::generator.edit')</span>
+                                                <span v-else>@lang('laravel-generator::generator.add')</span>
                                             </div>
                                             <div style="width: 100%;margin-bottom: 10px" class="s_flex fd-cl">
                                                 <span><em style="color: red;margin-right: 5px;">*</em>@lang('laravel-generator::generator.name')：</span>
-                                                <el-input v-model="labelForm.labelNames" :maxlength="6" size="small" style="width: 160px"></el-input>
+                                                <el-input v-model="labelForm.name" :maxlength="6" size="small" style="width: 160px"></el-input>
                                             </div>
                                         </div>
                                         <div style="padding: 0 20px;position:sticky;bottom: 0;background: #fff;">
-                                            <el-button v-if="!labelsVisible" type="text" @click="labelsVisible = true">@lang('laravel-generator::generator.add')</el-button>
+                                            <el-button v-if="!labelsVisible" type="text" @click="showForm(0,-1)">@lang('laravel-generator::generator.add')</el-button>
                                             <el-button v-if="labelsVisible"  type="text" @click="labelsVisible = false">@lang('laravel-generator::generator.cancel')</el-button>
                                             <el-button v-if="labelsVisible" type="danger" size="mini" @click="updateLabel">@lang('laravel-generator::generator.sure')</el-button>
                                         </div>
@@ -269,6 +270,11 @@
      .options:hover .delete-icon{
          visibility: visible;
      }
+     .el-select,.group-select {
+         user-select: none;
+         -webkit-user-select: none;
+         -ms-user-select: none;
+     }
     </style>
 @endsection
 @section('js')
@@ -296,8 +302,10 @@
                   showNote:true,
                   form:@json($form),
                   bean:{},
+                  index:0,
                   labelForm:{
-                      labelNames:''
+                      id:0,
+                      name:''
                   },
                   submitDisabled:false,
                   rules:{
@@ -317,24 +325,33 @@
               }
           },
           methods: {
-              deleteItem(index){
-                  this.$confirm('@lang('laravel-generator::generator.confirmDelete')', '@lang('laravel-generator::generator.notice')', {
-                      confirmButtonText: '@lang('laravel-generator::generator.sure')',
-                      cancelButtonText: '@lang('laravel-generator::generator.cancel')',
-                      type: 'warning'
-                  }).then(() => {
-                      axios.post('{{ route('generator.template.delete')  }}',{id:id}).then(function (res) {
-                          if(res.data.errcode==0){
-                              var href='{{ route('generator.index') }}?tab=templates'
-                              window.location.href=href;
-                          }else{
-                              vm.$message.error(res.data.message);
-                          }
-                      });
-                  }).catch(() => {});
+              showForm(id,index){
+                  this.labelsVisible = true
+                  this.labelForm.id = id;
+                  if(id>0){
+                      this.labelForm.name = this.template_types[index].label
+                  }
+                  this.index = index
               },
               updateLabel(){
-
+                  axios.post('{{ route('generator.template.updateType') }}',this.labelForm).then(function(res){
+                      console.log(res);
+                      var data=res.data;
+                      if(data.errcode==0){
+                          vm.labelsVisible = false
+                          if(vm.labelForm.id>0){
+                              vm.$set(vm.template_types,vm.index,{
+                                  label: data.data.name,
+                                  value: data.data.id
+                              })
+                          }else{
+                              vm.template_types.push({ label: data.data.name, value: data.data.id });
+                          }
+                      }else{
+                          vm.$message.error(data.message);
+                      }
+                      vm.submitDisabled=false;
+                  });
               },
               //插入内容
               insertEditor(text){
@@ -382,7 +399,8 @@
                   if(!flag){
                       this.labelsVisible = false
                       this.labelForm = {
-                          labelNames:'',
+                          id:0,
+                          name:'',
                       }
                   }
               },
