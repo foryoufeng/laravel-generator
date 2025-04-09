@@ -36,7 +36,7 @@ class GeneratorSeeder extends Seeder
         ]);
         if (!$generator->exists) {
             $generator->path = 'routes/';
-            $generator->file_name = 'route_DummySnakeClass.php';
+            $generator->file_name = 'web.php';
             $generator->is_checked = 1;
             $generator->template = $this->getRouteTemplate();
             $generator->template_id = $type->id;
@@ -48,9 +48,9 @@ class GeneratorSeeder extends Seeder
     {
         return <<<stub
 <?php
-Route::get('DummySnakeClass','Home\DummyClassController@index')->name('home.DummySnakeClass.index');
-Route::match(['get', 'post'],'DummySnakeClass/update','Home\DummyClassController@update')->name('home.DummySnakeClass.update');
-Route::post('DummySnakeClass/delete','Home\DummyClassController@delete')->name('home.DummySnakeClass.delete');
+Route::get('DummySnakeClass','Admin\DummyClassController@index')->name('admin.DummySnakeClass.index');
+Route::match(['get', 'post'],'DummySnakeClass/update','Admin\DummyClassController@update')->name('admin.DummySnakeClass.update');
+Route::post('DummySnakeClass/delete','Admin\DummyClassController@delete')->name('admin.DummySnakeClass.delete');
 stub;
 
     }
@@ -84,14 +84,14 @@ stub;
             'name' => LaravelGeneratorType::Controllers,
         ]);
         $generator = LaravelGenerator::firstOrNew([
-            'name' => 'homeController',
+            'name' => 'Admin Controller',
         ]);
         $controllerTemps = $this->getControllersTemplate();
         if (!$generator->exists) {
-            $generator->path = 'app/Http/Controllers/Home/';
+            $generator->path = 'app/Http/Controllers/Admin/';
             $generator->file_name = 'DummyClassController.php';
             $generator->is_checked = 1;
-            $generator->template = $controllerTemps['home'];
+            $generator->template = $controllerTemps['admin'];
             $generator->template_id = $type->id;
             $generator->save();
         }
@@ -165,14 +165,14 @@ class DummyClassController extends Controller
 
             return response()->json(['message' => 'success', 'errcode' => 0, 'data' => \$query->paginate()->toArray()]);
         }
-        return view('home.DummySnakeClass.index');
+        return view('admin.DummySnakeClass.index');
     }
 
     public function show(Request \$request)
     {
         \$DummySnakeClass=DummyClass::find(1);
 
-        return view('home.DummySnakeClass.show',[
+        return view('admin.DummySnakeClass.show',[
             'item'=>\$DummySnakeClass
         ]);
     }
@@ -206,7 +206,7 @@ class DummyClassController extends Controller
                 'name'=>''
             ];
         }
-        return view('home.DummySnakeClass.update',compact('DummySnakeClass'));
+        return view('admin.DummySnakeClass.update',compact('DummySnakeClass'));
     }
 
     public function delete(Request \$request)
@@ -222,7 +222,7 @@ class DummyClassController extends Controller
 stub;
 
         return [
-            'home' => $homeTemp,
+            'admin' => $homeTemp,
         ];
     }
 
@@ -469,30 +469,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 <%* soft delete *%>
 <%if(DummyModelFields.soft_deletes){%>
-use Illuminate\Database\\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 <%}%>
 
 class DummyClass extends Model
 {
-<%* 模板注释 *%>
-<%* Template annotation *%>
 
 <%if(DummyModelFields.soft_deletes){%>
      use SoftDeletes;
 <%}%>
-<%* primary_key *%>
-<%if('id'!=DummyModelFields.primary_key){%>
-     protected \$primaryKey = '<%=DummyModelFields.primary_key%>';
-
-<%}%>
-     <%* fillable *%>
      protected \$fillable = [<%for(item of DummyTableFields){%><%if('id'!=item.field_name) { %>'<%=item.field_name%>',<%}%><%}%>];
 
 <%if(!DummyModelFields.timestamps){%>
      public \$timestamps = false;
-
 <%}%>
- <%* add relation *%>
+
 <%for(relationship of DummyRelationShips){%>
     <%if('hasMany'==relationship.relationship) { %>
      public function <%=relationship.snake_plural_model%>(){

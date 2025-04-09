@@ -131,13 +131,11 @@
             <el-switch style="margin-left: 50px;user-select: none;"
                     v-model="ruleForm.timestamps"
                     active-text="Created_at & Updated_at"
-                    active-color="#13ce66"
             >
             </el-switch>
             <el-switch style="margin-left: 20px;user-select: none; "
                     v-model="ruleForm.soft_deletes"
                     active-text="Soft deletes"
-                    active-color="#13ce66"
             >
             </el-switch>
         </el-form-item>

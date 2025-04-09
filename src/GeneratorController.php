@@ -107,28 +107,37 @@ class GeneratorController extends BaseController
                     $message = Artisan::output();
                     $paths['migrate'] = $message;
                 }
-                //3.是否运行 Create unit test.
-                if (\in_array('unittest', $create, true)) {
-                    Artisan::call('make:test', ['name' => $model_name.'Test', '--unit' => 'unit']);
-                    $message = Artisan::output();
-                    $paths['unit_test'] = $message;
-                }
                 //4.生成模板文件
                 $generator_templates = $data['generator_templates'];
+                $file = app('files');
+
                 foreach ($generator_templates as $k => $template) {
-                    $paths['files-'.($k+1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
+                    $file_real_name = $template['file_real_name'];
+                    $path = base_path($file_real_name);
+                    if ($file->exists($path)) {
+                        // route special handling
+                        if(str_contains($file_real_name,'routes/') && str_contains($file_real_name,'.php')){
+                            $file->append($path, str_replace('<?php','',$template['template']));
+                            $paths['files-'.($k+1)] = "file [$file_real_name] append success !";
+                        }else{
+                            $paths['files-'.($k+1)] = "file [$file_real_name] already exists!";
+                        }
+                    }else{
+                        $paths['files-'.($k+1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
+                    }
                 }
                 //5.处理关联关系
                 $relationships=$request->get('relationships');
                 $this->dealRelationShips($relationships,$model_name,$modelInfo);
                 //6.是否运行idea代码提示
                 if (\in_array('ide-helper', $create, true)) {
-                    Artisan::call('ide-helper:models', [
-                        '--write' => true,
-                        'model'=>[
-                            ucfirst(str_replace('/','\\',$modelInfo->path).$model_name)
-                        ]
-                    ]);
+                        Artisan::call('ide-helper:models', [
+                            '--write' => true,
+                            '--write-eloquent-helper' => true,
+                            'model'=>[
+                                ucfirst(str_replace('/','\\',$modelInfo->path).$model_name)
+                            ]
+                        ]);
                 }
             }
 

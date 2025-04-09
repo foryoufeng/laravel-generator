@@ -65,8 +65,9 @@ class GeneratorTemplateController extends BaseController
         $functions = GeneratorUtils::getFunctions();
         //自定义变量
         $customDummys=config('generator.customDummys',[]);
+        $tags = config('generator.tags');
 
-        return view('laravel-generator::template_update', compact('template_types',
+        return view('laravel-generator::template_update', compact('template_types','tags',
                              'laravel_generators', 'dummyAttrs', 'functions', 'form','customDummys'));
     }
 

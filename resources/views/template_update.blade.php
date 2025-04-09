@@ -163,17 +163,33 @@
                                                allow-create
                                                placeholder="@lang('laravel-generator::generator.group')"
                                                no-data-text="@lang('laravel-generator::generator.noData')"
+                                               @visible-change="visibleChange"
                                                @change="selectChange()">
-                                        <el-option
+                                        <el-option class="options"
+                                                v-show="!labelsVisible"
                                                 v-for="item in template_types"
                                                 :key="item.value"
                                                 :label="item.label"
                                                 :value="item.value">
+                                            <span style="float: left">@{{ item.label }}</span>
+                                            <span style="float: right; color: #8492a6; font-size: 13px" class="delete-icon"><i class="el-icon-delete" @click.prevent.stop="deleteItem(item.value)"></i></span>
                                         </el-option>
+                                        <div class="selectLabels s_flex fd-cl ai_ct" v-show="labelsVisible" style="margin-top: 10px;">
+                                            <div style="width: 100%;margin-bottom: 10px">
+                                                <em class="iconfont icon-flow" style="cursor: pointer;" @click="labelsVisible = false"></em>
+                                                <span>@lang('laravel-generator::generator.add')</span>
+                                            </div>
+                                            <div style="width: 100%;margin-bottom: 10px" class="s_flex fd-cl">
+                                                <span><em style="color: red;margin-right: 5px;">*</em>@lang('laravel-generator::generator.name')：</span>
+                                                <el-input v-model="labelForm.labelNames" :maxlength="6" size="small" style="width: 160px"></el-input>
+                                            </div>
+                                        </div>
+                                        <div style="padding: 0 20px;position:sticky;bottom: 0;background: #fff;">
+                                            <el-button v-if="!labelsVisible" type="text" @click="labelsVisible = true">@lang('laravel-generator::generator.add')</el-button>
+                                            <el-button v-if="labelsVisible"  type="text" @click="labelsVisible = false">@lang('laravel-generator::generator.cancel')</el-button>
+                                            <el-button v-if="labelsVisible" type="danger" size="mini" @click="updateLabel">@lang('laravel-generator::generator.sure')</el-button>
+                                        </div>
                                     </el-select>
-                                    <div class="el-form-item__error" style="color: #000000" v-if="showNote">
-                                        @lang('laravel-generator::generator.ifNotExit')
-                                    </div>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="4">
@@ -193,11 +209,9 @@
                             </el-col>
 
                             <el-col :span="8" style="margin-left: 10px">
-                                <el-tag style="cursor: pointer" @click.native="addPathName('app/Http/Controllers/Home/','DummyClassController.php')">Controller</el-tag>
-                                <el-tag style="cursor: pointer" @click.native="addPathName('resources/views/home/DummySnakeClass/','index.blade.php')" type="success">View</el-tag>
-                                <el-tag style="cursor: pointer" @click.native="addPathName('app/Http/Requests/','DummyClassRequest.php')" type="info">Request</el-tag>
-                                <el-tag style="cursor: pointer" @click.native="addPathName('resources/assets/js/DummySnakeClass/','index.vue')" type="warning">Vue</el-tag>
-                                <el-tag style="cursor: pointer" @click.native="addPathName('app/Models/','DummyClass.php')" type="danger">Model</el-tag>
+                                @foreach($tags as $tag)
+                                    <el-tag style="cursor: pointer" @click.native="addPathName('{{ $tag["path"] }}','{{ $tag["file"] }}')" type="{{ $tag["type"] }}">{{ $tag["name"] }}</el-tag>
+                                @endforeach
                             </el-col>
                         </el-row>
                         <el-row type="flex">
@@ -246,6 +260,15 @@
      .margin_top{
          padding: 10px;
      }
+     .selectLabels {
+         padding: 5px 20px;
+     }
+     .delete-icon{
+         visibility: hidden;
+     }
+     .options:hover .delete-icon{
+         visibility: visible;
+     }
     </style>
 @endsection
 @section('js')
@@ -261,7 +284,8 @@
           el: '#app',
           data() {
               return {
-                  message: 'Hello',
+                  labelsVisible:false,
+                  // labelsVisible:true,
                   editor:{},
                   editor2:{},
                   template:'',
@@ -272,6 +296,9 @@
                   showNote:true,
                   form:@json($form),
                   bean:{},
+                  labelForm:{
+                      labelNames:''
+                  },
                   submitDisabled:false,
                   rules:{
                       name: [
@@ -290,6 +317,25 @@
               }
           },
           methods: {
+              deleteItem(index){
+                  this.$confirm('@lang('laravel-generator::generator.confirmDelete')', '@lang('laravel-generator::generator.notice')', {
+                      confirmButtonText: '@lang('laravel-generator::generator.sure')',
+                      cancelButtonText: '@lang('laravel-generator::generator.cancel')',
+                      type: 'warning'
+                  }).then(() => {
+                      axios.post('{{ route('generator.template.delete')  }}',{id:id}).then(function (res) {
+                          if(res.data.errcode==0){
+                              var href='{{ route('generator.index') }}?tab=templates'
+                              window.location.href=href;
+                          }else{
+                              vm.$message.error(res.data.message);
+                          }
+                      });
+                  }).catch(() => {});
+              },
+              updateLabel(){
+
+              },
               //插入内容
               insertEditor(text){
                   var selection = this.editor.getSelection();
@@ -331,6 +377,14 @@
                */
               selectChange(){
                 this.showNote=false;
+              },
+              visibleChange(flag){
+                  if(!flag){
+                      this.labelsVisible = false
+                      this.labelForm = {
+                          labelNames:'',
+                      }
+                  }
               },
               /**
                * 插入函数

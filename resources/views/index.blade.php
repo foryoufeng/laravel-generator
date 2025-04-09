@@ -466,7 +466,7 @@
                                     vm.$message({
                                         title: 'error',
                                         dangerouslyUseHTMLString: true,
-                                        message: 'aa',
+                                        message: message,
                                         center: true,
                                         type: 'error',
                                         duration:8000
