@@ -1,5 +1,5 @@
-<el-tab-pane>
-    <span slot="label"><i class="el-icon-star-on"></i> @lang('laravel-generator::generator.generateLog')</span>
+<el-tab-pane name="log">
+    <span slot="label"><i class="el-icon-menu"></i> @lang('laravel-generator::generator.generateLog')</span>
 
     <el-form ref="form"  :inline="true">
         <el-form-item label="{{ trans('laravel-generator::generator.modelName') }}:">
@@ -15,9 +15,7 @@
             <el-button type="primary" @click="getLogs()" icon="el-icon-search" style="float: left;margin-left: 10px"></el-button>
         </el-form-item>
         <el-form-item>
-            <a href="{{ route('generator.template.update') }}" target="_blank">
-                <el-button type="danger" style="float: left;margin-left: 10px">{{ trans('laravel-generator::generator.add') }}</el-button>
-            </a>
+            <el-button type="danger" style="float: left;margin-left: 10px" @click="switchTab('generator',getRuleForm())">{{ trans('laravel-generator::generator.add') }}</el-button>
         </el-form-item>
     </el-form>
     <el-table
@@ -56,10 +54,16 @@
                 label="{{ trans('laravel-generator::generator.actions') }}"
                 width="200">
             <template slot-scope="scope">
-                <a :href="'{{ route('generator.template.update') }}?id='+scope.row.id" target="_blank">
-                    <el-button type="primary" icon="el-icon-edit" circle></el-button>
-                </a>
-                <el-button  @click="deleteLog(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>
+
+                <el-tooltip class="item" effect="dark" content="@lang('laravel-generator::generator.edit')" placement="bottom-end">
+                    <el-button type="primary" @click="editLog(scope.row,scope.row.id)" icon="el-icon-edit" circle></el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="@lang('laravel-generator::generator.copy')" placement="bottom-end">
+                    <el-button  @click="editLog(scope.row,0)" type="warning" icon="el-icon-document" circle></el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="@lang('laravel-generator::generator.delete')" placement="bottom-end">
+                    <el-button  @click="deleteLog(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>
+                </el-tooltip>
             </template>
         </el-table-column>
 

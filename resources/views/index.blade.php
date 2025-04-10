@@ -1,6 +1,6 @@
 @extends('laravel-generator::layout')
 @section('content')
-    <el-tabs type="border-card" value="{{ $tab }}">
+    <el-tabs type="border-card" v-model="tab">
         {{--generator logs--}}
         @include('laravel-generator::generator_logs')
         {{--generator--}}
@@ -89,6 +89,7 @@
                 search:{
                     name:''
                 },
+                tab:'{{ $tab }}',
                 logSearch:{
                     model_name:'',
                     display_name:'',
@@ -105,40 +106,7 @@
                 dummyValues:[],
                 //模板列表
                 template_types:@json($template_types['datas']),
-                ruleForm: {
-                    id: 0,
-                    modelName: '',
-                    modelDisplayName: '',
-                    create:[
-                        'migration',
-                        'migrate',
-                        'ide-helper',
-                        'unittest'
-                    ],
-                    primary_key:'id',
-                    timestamps:true,
-                    foreigns:[],
-                    relationships:[],
-                    table_fields:[{
-                        field_name:'',
-                        field_display_name:'',
-                        type:'string',
-                        nullable:false,
-                        is_show_lists:true,
-                        can_search:false,
-                        key:'',
-                        default:'',
-                        comment:'',
-                        attach:'',
-                    }],
-                    soft_deletes:false,
-                    //选中的模板数据
-                    templates:{
-                        @foreach($template_types['datas'] as $templates)
-                        '{{ $templates['name'] }}':@json($templates['checked']),
-                        @endforeach
-                    },
-                },
+                ruleForm: {},
                 migrateForm:{
                     prefix:'add',
                     tableName:'',
@@ -172,7 +140,7 @@
                 }
             },
             computed: {
-                migrateName:function () {
+                migrateName() {
                     var name=this.migrateForm.prefix+'_';
                     if(this.migrateForm.table_fields.length>2){
                         name+=this.migrateForm.table_fields[0]['field_name']+'AndMore_'
@@ -188,7 +156,7 @@
                     name+='to_'+this.migrateForm.tableName+'_table';
                     return name;
                 },
-                foreignFileds: function () {
+                foreignFileds() {
                     var fields=[];
                     for (var index in this.ruleForm.table_fields) {
                         var field=this.ruleForm.table_fields[index]['field_name'];
@@ -261,12 +229,61 @@
                     deep:true
                 },
             },
+            created() {
+                this.ruleForm = this.getRuleForm()
+            },
             mounted(){
                 //加载数据
                 this.getData();
                 this.getLogs()
             },
             methods:{
+                getRuleForm(){
+                  return  {
+                      id: 0,
+                      modelName: '',
+                      modelDisplayName: '',
+                      create:[
+                          'migration',
+                          'migrate',
+                          'ide-helper',
+                      ],
+                      primary_key:'id',
+                      timestamps:true,
+                      foreigns:[],
+                      relationships:[],
+                      table_fields:[{
+                          field_name:'',
+                          field_display_name:'',
+                          type:'string',
+                          nullable:false,
+                          is_show_lists:true,
+                          can_search:false,
+                          key:'',
+                          default:'',
+                          comment:'',
+                          attach:'',
+                      }],
+                      soft_deletes:false,
+                      //选中的模板数据
+                      templates:{
+                          @foreach($template_types['datas'] as $templates)
+                          '{{ $templates['name'] }}':@json($templates['checked']),
+                          @endforeach
+                      },
+                  }
+                },
+                editLog(row,id){
+                    const ruleForm = JSON.parse(row.configs);
+                    if(ruleForm){
+                        ruleForm.id = id
+                        this.switchTab('generator',ruleForm)
+                    }
+                },
+                switchTab(tab,ruleForm) {
+                    this.tab = tab;
+                    this.ruleForm = ruleForm
+                },
                 handlePage(val){
                     this.getLogs(val);
                 },
@@ -381,7 +398,6 @@
                 replaceCustomDummy(str){
                     var customDummys=@json($customDummys);
                     for (var index in customDummys){
-                        console.log(index+'==>'+customDummys[index])
                         str=str.replace(new RegExp(index,"gm"),customDummys[index]);
                     }
                     return str;

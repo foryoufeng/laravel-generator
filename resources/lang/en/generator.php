@@ -34,6 +34,7 @@ return [
      'no'=>'no',
      'delete'=>'delete',
      'edit'=>'edit',
+     'copy'=>'Copy',
      'defaultValue'=>'Default Value',
      'notFound'=>'not found',
      'actions'=>'actions',

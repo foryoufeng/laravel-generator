@@ -34,6 +34,7 @@ return [
     'no'=>'否',
     'delete'=>'删除',
     'edit'=>'编辑',
+    'copy'=>'复制',
     'notFound'=>'没有找到',
     'defaultValue'=>'默认值',
     'actions'=>'操作',

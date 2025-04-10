@@ -9,7 +9,7 @@
 
 namespace Foryoufeng\Generator;
 
-use App\Models\LaravelGeneratorLog;
+use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
 use Illuminate\Http\Request;
@@ -30,7 +30,7 @@ class GeneratorController extends BaseController
     {
         $generator = config('generator');
         // 设置展示的tab
-        $tab = $request->get('tab');
+        $tab = $request->get('tab','log');
         // 获取所有的表
         $tables = GeneratorUtils::getTables();
         // 获取可用的数据类型
@@ -259,15 +259,15 @@ class GeneratorController extends BaseController
      */
     private function getTemplateTypes()
     {
-        $datas = LaravelGeneratorType::with('templates')->get();
-        $select = $datas->map(function ($item) {
+        $data = LaravelGeneratorType::with('templates')->get();
+        $select = $data->map(function ($item) {
             $data = [];
             $data['label'] = $item->name;
             $data['value'] = $item->id;
 
             return $data;
         });
-        $datas = $datas->map(function ($item) {
+        $data = $data->map(function ($item) {
             $item->checked = $item->templates->filter(function ($value) {
                 return $value['is_checked'];
             })->pluck('id');
@@ -281,7 +281,7 @@ class GeneratorController extends BaseController
         });
 
         return [
-            'datas' => $datas,
+            'datas' => $data,
             'select' => $select,
         ];
     }

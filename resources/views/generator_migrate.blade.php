@@ -70,7 +70,9 @@
                 <el-col :span="1">
                     <el-checkbox v-model="table.change" style="margin-left: 20px"></el-checkbox>
                 </el-col>
-                <el-col :span="2" style="margin-left: 10px"><el-button type="danger" icon="el-icon-delete"  @click="deleteMigrateTable(index)">remove</el-button></el-col>
+                <el-col :span="2" style="margin-left: 10px">
+                    <i class="el-icon-delete" style="color: red;cursor: pointer;padding: 5px" @click="deleteMigrateTable(index)"></i>
+                </el-col>
             </el-row>
         </el-form-item>
         <el-form-item >

@@ -8,7 +8,7 @@
 
 namespace Foryoufeng\Generator\Database;
 
-use App\Models\LaravelGeneratorLog;
+use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Illuminate\Database\Seeder;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;

@@ -172,7 +172,7 @@
                                                 :label="item.label"
                                                 :value="item.value">
                                             <span style="float: left">@{{ item.label }}</span>
-                                            <span style="float: right; color: #8492a6; font-size: 13px" class="delete-icon"><i class="el-icon-edit" @click.prevent.stop="showForm(item.value,index)"></i></span>
+                                            <span style="float: right; color: #8492a6; font-size: 13px" class="delete-icon"><i class="el-icon-edit-outline" @click.prevent.stop="showForm(item.value,index)"></i></span>
                                         </el-option>
                                         <div class="selectLabels s_flex fd-cl ai_ct" v-show="labelsVisible" style="margin-top: 10px;">
                                             <div style="width: 100%;margin-bottom: 10px">

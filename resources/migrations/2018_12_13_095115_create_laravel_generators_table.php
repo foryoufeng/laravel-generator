@@ -47,6 +47,6 @@ class CreateLaravelGeneratorsTable extends Migration
     {
         Schema::dropIfExists('laravel_generators');
         Schema::dropIfExists('laravel_generator_types');
-        Schema::dropIfExists('laravel_generator_types');
+        Schema::dropIfExists('laravel_generator_logs');
     }
 }
