@@ -248,7 +248,7 @@ public $timestamps = false;
                 ],
                 [
                     'field_name' => 'add_time',
-                    'field_display_name' => trans('laravel-generator::generator.add_time'),
+                    'field_display_name' => trans('laravel-generator::generator.addTime'),
                     'type' => 'timestamp',
                     'nullable' => true,
                     'key' => '',

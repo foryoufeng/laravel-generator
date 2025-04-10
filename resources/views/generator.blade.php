@@ -1,7 +1,7 @@
-<el-tab-pane>
+<el-tab-pane  name="generator">
     <span slot="label"><i class="el-icon-menu"></i> generator</span>
     <el-form label-position="top" :model="ruleForm"  status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="model" prop="modelName" style="margin-bottom: 5px">
+        <el-form-item label="@lang('laravel-generator::generator.modelName')" prop="modelName" style="margin-bottom: 5px">
             <el-input v-model="ruleForm.modelName"  style="float: left;width: 400px;margin-right: 20px"></el-input>
         </el-form-item>
         <el-form-item label="@lang('laravel-generator::generator.displayName')" prop="modelDisplayName" style="margin-bottom: 5px">
@@ -62,8 +62,8 @@
                         <span slot="reference">@lang('laravel-generator::generator.canSearch')<i class="el-icon-question"></i></span>
                     </el-popover>
                 </el-col>
-                <el-col :span="1">Rule</el-col>
-                <el-col :span="1">Action</el-col>
+                <el-col :span="1">@lang('laravel-generator::generator.rule')</el-col>
+                <el-col :span="1">@lang('laravel-generator::generator.action')</el-col>
             </el-row>
             <el-row v-for="(table,index) in ruleForm.table_fields" style="margin-bottom: 20px">
                 <el-col :span="2">
@@ -294,7 +294,8 @@
         {{--    添加关联关系/end     --}}
 
         <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" :loading="loadding">@lang('laravel-generator::generator.submit')</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm','save')" :loading="loadding">@lang('laravel-generator::generator.save')</el-button>
+            <el-button type="success" @click="submitForm('ruleForm','saveGenerate')" :loading="loadding">@lang('laravel-generator::generator.saveGenerate')</el-button>
         </el-form-item>
 
     </el-form>

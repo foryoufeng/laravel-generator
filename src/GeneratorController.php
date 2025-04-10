@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Administrator
@@ -8,12 +9,13 @@
 
 namespace Foryoufeng\Generator;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGenerator;
-use Illuminate\Routing\Controller as BaseController;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 class GeneratorController extends BaseController
 {
@@ -27,31 +29,30 @@ class GeneratorController extends BaseController
     public function index(Request $request)
     {
         $generator = config('generator');
-        //设置展示的tab
+        // 设置展示的tab
         $tab = $request->get('tab');
-        //获取所有的表
+        // 获取所有的表
         $tables = GeneratorUtils::getTables();
-        //获取可用的数据类型
+        // 获取可用的数据类型
         $dbTypes = GeneratorUtils::getDbTypes();
-        //获取模板列表
+        // 获取模板列表
         $template_types = $this->getTemplateTypes();
-        //获取模型的信息
+        // 获取模型的信息
         $modelInfo = $this->getModelInfo();
-        //获取可用的规则
+        // 获取可用的规则
         $rules = $this->getRules();
-        //可用的假属性字段
+        // 可用的假属性字段
         $dummyAttrs = GeneratorUtils::getDummyAttrs();
-        //自定义变量
-        $customDummys=config('generator.customDummys');
+        // 自定义变量
+        $customDummys = config('generator.customDummys');
 
         return view('laravel-generator::index', compact('dbTypes', 'generator',
-            'tab', 'template_types', 'dummyAttrs', 'tables', 'rules', 'modelInfo','customDummys'));
+            'tab', 'template_types', 'dummyAttrs', 'tables', 'rules', 'modelInfo', 'customDummys'));
     }
 
     /**
      * 获取指定的名称的转换数据.
      *
-     * @param $name
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -67,24 +68,44 @@ class GeneratorController extends BaseController
     /**
      * save data.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         $paths = [];
-        //获取模型的信息
+        $data = $request->validate([
+            'id' => 'required',
+            'modelName' => 'required',
+            'modelDisplayName' => 'required',
+            'submit_type' => 'required',
+            'generator_templates' => 'array',
+        ]);
+        $id = $data['id'];
+        if($id>0){
+            $log = LaravelGeneratorLog::findOrFail($id);
+        }else{
+            $log = new LaravelGeneratorLog();
+        }
+        $item['model_name'] = $data['modelName'];
+        $item['display_name'] = $data['modelDisplayName'];
+        $item['creator'] = config('generator.customDummys.DummyAuthor','');
+        $item['configs'] = json_encode($request->except('id'));
+        $log->fill($item);
+        $res = $log->save();
+        if($data['submit_type'] === 'save'){
+            if($res){
+                return $this->success(['save success']);
+            }
+            return $this->error('save error');
+        }
+        // 获取模型的信息
         $modelInfo = $this->getModelInfo();
         try {
             $doMigrate = $request->get('doMigrate', []);
             $table_fields = $request->get('table_fields');
-            //生成数据
-            if (!$doMigrate) {
-                $data = $request->validate([
-                    'modelName' => 'required',
-                    'generator_templates' => 'array',
-                ]);
+            // 生成数据
+            if (! $doMigrate) {
                 $model_name = $data['modelName'];
 
                 $create = $request->get('create', []);
@@ -107,7 +128,7 @@ class GeneratorController extends BaseController
                     $message = Artisan::output();
                     $paths['migrate'] = $message;
                 }
-                //4.生成模板文件
+                // 4.生成模板文件
                 $generator_templates = $data['generator_templates'];
                 $file = app('files');
 
@@ -116,32 +137,32 @@ class GeneratorController extends BaseController
                     $path = base_path($file_real_name);
                     if ($file->exists($path)) {
                         // route special handling
-                        if(str_contains($file_real_name,'routes/') && str_contains($file_real_name,'.php')){
-                            $file->append($path, str_replace('<?php','',$template['template']));
-                            $paths['files-'.($k+1)] = "file [$file_real_name] append success !";
-                        }else{
-                            $paths['files-'.($k+1)] = "file [$file_real_name] already exists!";
+                        if (str_contains($file_real_name, 'routes/') && str_contains($file_real_name, '.php')) {
+                            $file->append($path, str_replace('<?php', '', $template['template']));
+                            $paths['files-'.($k + 1)] = "file [$file_real_name] append success !";
+                        } else {
+                            $paths['files-'.($k + 1)] = "file [$file_real_name] already exists!";
                         }
-                    }else{
-                        $paths['files-'.($k+1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
+                    } else {
+                        $paths['files-'.($k + 1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
                     }
                 }
-                //5.处理关联关系
-                $relationships=$request->get('relationships');
-                $this->dealRelationShips($relationships,$model_name,$modelInfo);
-                //6.是否运行idea代码提示
+                // 5.处理关联关系
+                $relationships = $request->get('relationships');
+                $this->dealRelationShips($relationships, $model_name, $modelInfo);
+                // 6.是否运行idea代码提示
                 if (\in_array('ide-helper', $create, true)) {
-                        Artisan::call('ide-helper:models', [
-                            '--write' => true,
-                            '--write-eloquent-helper' => true,
-                            'model'=>[
-                                ucfirst(str_replace('/','\\',$modelInfo->path).$model_name)
-                            ]
-                        ]);
+                    Artisan::call('ide-helper:models', [
+                        '--write' => true,
+                        '--write-eloquent-helper' => true,
+                        'model' => [
+                            ucfirst(str_replace('/', '\\', $modelInfo->path).$model_name),
+                        ],
+                    ]);
                 }
             }
 
-            //新增加迁移文件
+            // 新增加迁移文件
             if (\in_array('migration', $doMigrate, true)) {
                 $tableName = $request->get('tableName');
                 $migrationName = $request->get('prefix').'_';
@@ -154,7 +175,7 @@ class GeneratorController extends BaseController
                 $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint($table_fields, null, false)
                     ->create($migrationName, database_path('migrations'), $tableName, false);
                 //  Run migrate.
-                if (\in_array('migrate', $request->get('doMigrate'),true)) {
+                if (\in_array('migrate', $request->get('doMigrate'), true)) {
                     Artisan::call('migrate');
                     $message = Artisan::output();
                     $paths['migrate'] = $message;
@@ -167,34 +188,36 @@ class GeneratorController extends BaseController
         return $this->success($paths);
     }
 
-    private function dealRelationShips($relationships,$model_name,$modelInfo)
+    private function dealRelationShips($relationships, $model_name, $modelInfo)
     {
-        if($relationships){
-            foreach ($relationships as $relationship){
-                //替换相对模型的数据
-                $file_name=base_path($modelInfo->path).$relationship['model'].'.php';
-                if($relationship['reverse'] && file_exists($file_name)){
-                    $oldData=file_get_contents($file_name);
-                    $oldData=str_replace(["\n\n\n", "\n    \n"], ["\n\n", ''], substr($oldData,0,-1));
-                    $oldData=substr($oldData,0,-1);
-                    if('hasMany'==$relationship['reverse']){
-                        $funName=Str::snake(Str::plural($model_name));
-                    }else{
-                        $funName=Str::camel($model_name);
+        if ($relationships) {
+            foreach ($relationships as $relationship) {
+                // 替换相对模型的数据
+                $file_name = base_path($modelInfo->path).$relationship['model'].'.php';
+                if ($relationship['reverse'] && file_exists($file_name)) {
+                    $oldData = file_get_contents($file_name);
+                    $oldData = str_replace(["\n\n\n", "\n    \n"], ["\n\n", ''], substr($oldData, 0, -1));
+                    $oldData = substr($oldData, 0, -1);
+                    if ($relationship['reverse'] === 'hasMany') {
+                        $funName = Str::snake(Str::plural($model_name));
+                    } else {
+                        $funName = Str::camel($model_name);
                     }
-                    $key='';
-                    if($relationship['foreign_key']){
-                        $key=",'{$relationship['foreign_key']}'";
+                    $key = '';
+                    if ($relationship['foreign_key']) {
+                        $key = ",'{$relationship['foreign_key']}'";
                     }
-                    $oldData.="     public function {$funName}(){\n";
-                    $oldData.="         return \$this->{$relationship['reverse']}({$model_name}::class{$key});\n";
-                    $oldData.="     }\n\n}";
-                    file_put_contents($file_name,$oldData);
+                    $oldData .= "     public function {$funName}(){\n";
+                    $oldData .= "         return \$this->{$relationship['reverse']}({$model_name}::class{$key});\n";
+                    $oldData .= "     }\n\n}";
+                    file_put_contents($file_name, $oldData);
                 }
             }
         }
+
         return true;
     }
+
     /**
      * 获取可用的规则.
      *
@@ -222,7 +245,7 @@ class GeneratorController extends BaseController
         $model = LaravelGenerator::whereHas('template_type', function ($query) {
             $query->whereName(LaravelGeneratorType::MODEL);
         })->first();
-        if (!$model) {
+        if (! $model) {
             throw new \RuntimeException('the template model not found');
         }
 
@@ -261,5 +284,33 @@ class GeneratorController extends BaseController
             'datas' => $datas,
             'select' => $select,
         ];
+    }
+
+    public function getLogs(Request $request)
+    {
+        $model_name = $request->get('model_name');
+        $display_name = $request->get('display_name');
+        $creator = $request->get('creator');
+
+        $datas = LaravelGeneratorLog::when($model_name, fn ($query) => $query->where('model_name', 'like', '%'.$model_name.'%'))
+            ->when($display_name, fn ($query) => $query->where('display_name', 'like', '%'.$display_name.'%'))
+            ->when($creator, fn ($query) => $query->where('creator', 'like', '%'.$creator.'%'))
+            ->orderBy('id', 'desc')
+            ->paginate();
+
+        return $this->success($datas);
+    }
+
+    public function deleteLog(Request $request)
+    {
+        $id = $request->get('id');
+
+        $res = LaravelGeneratorLog::whereId($id)->delete();
+
+        if ($res) {
+            return $this->success('success');
+        }
+
+        return $this->error('delete error');
     }
 }

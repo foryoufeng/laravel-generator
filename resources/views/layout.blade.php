@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('generator.name') }}</title>
+    <link rel="icon" type="image/png" href="/vendor/laravel-generator/images/logo.png">
     <!-- Styles -->
     <link href="/vendor/laravel-generator/css/element.css" rel="stylesheet" type="text/css">
     <style>
@@ -31,10 +32,18 @@
             padding: 10px 0;
             background-color: #f9fafc;
         }
-        .header{
-            color:#3A88FD;
-            padding: 20px;
+        .header {
+            display: flex;
+            flex-direction: row;       /* 图片和文字一行 */
+            align-items: center;       /* 让文字垂直居中对齐图片 */
+            justify-content: center;   /* 可选：让整组内容居中对齐 */
+            height: 100px;              /* 可根据需求设置 header 高度 */
+            gap: 10px;                 /* 图片和文字之间的间距 */
+        }
+        .title {
+            margin: 0;                 /* 去掉 p 标签默认的 margin */
             font-size: 30px;
+            color:#FF2D20;
         }
         #app input{
         }
@@ -48,9 +57,9 @@
 <div id="app" class="content" v-cloak>
     <div >
         <el-container>
-
             <el-header class="header">
-                <i class="el-icon-rank"></i>{{ config('generator.name','Laravel-generator') }}
+                <img src="/vendor/laravel-generator/images/logo.png" style="width: 70px">
+                <p class="title">{{ config('generator.name','Laravel-generator') }}</p>
             </el-header>
             <el-main>
                 @yield('content')

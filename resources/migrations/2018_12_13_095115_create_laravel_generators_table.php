@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateLaravelGeneratorsTable extends Migration
 {
@@ -29,6 +29,15 @@ class CreateLaravelGeneratorsTable extends Migration
 
             $table->timestamps();
         });
+
+        Schema::create('laravel_generator_logs', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('model_name')->comment('model name');
+            $table->string('display_name')->comment('display name');
+            $table->string('creator')->comment('creator');
+            $table->json('configs')->comment('configs');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -37,7 +46,7 @@ class CreateLaravelGeneratorsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('laravel_generators');
-
+        Schema::dropIfExists('laravel_generator_types');
         Schema::dropIfExists('laravel_generator_types');
     }
 }

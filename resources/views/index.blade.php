@@ -1,6 +1,8 @@
 @extends('laravel-generator::layout')
 @section('content')
     <el-tabs type="border-card" value="{{ $tab }}">
+        {{--generator logs--}}
+        @include('laravel-generator::generator_logs')
         {{--generator--}}
         @include('laravel-generator::generator')
         {{--migrate--}}
@@ -87,7 +89,14 @@
                 search:{
                     name:''
                 },
+                logSearch:{
+                    model_name:'',
+                    display_name:'',
+                    creator:''
+                },
                 //模板数据
+                logs:[],
+                pageInfo:{},
                 templates:[],
                 //数据库表数据
                 tables:@json($tables),
@@ -97,6 +106,7 @@
                 //模板列表
                 template_types:@json($template_types['datas']),
                 ruleForm: {
+                    id: 0,
                     modelName: '',
                     modelDisplayName: '',
                     create:[
@@ -254,8 +264,29 @@
             mounted(){
                 //加载数据
                 this.getData();
+                this.getLogs()
             },
             methods:{
+                handlePage(val){
+                    this.getLogs(val);
+                },
+                setPageInfo(pageInfo){
+                    this.pageInfo.total=pageInfo.total;
+                    this.pageInfo.per_page=pageInfo.per_page;
+                    this.pageInfo.current_page=pageInfo.current_page;
+                },
+                getLogs(page = 1){
+                    this.logSearch.page = page
+                    axios.get('{{ route('generator.logs') }}',{params:this.logSearch}).then(res=> {
+                        let data=res.data;
+                        if(data.errcode==0){
+                            this.logs=data.data.data;
+                            this.setPageInfo(data.data);
+                        }else {
+                            this.logs=[];
+                        }
+                    })
+                },
                 /**
                  * 处理回车换行
                  */
@@ -412,33 +443,50 @@
                             });
                         }).catch(() => {});
                 },
+                deleteLog(id){
+                    this.$confirm('@lang('laravel-generator::generator.confirmDelete')', '@lang('laravel-generator::generator.notice')', {
+                        confirmButtonText: '@lang('laravel-generator::generator.sure')',
+                        cancelButtonText: '@lang('laravel-generator::generator.cancel')',
+                        type: 'warning'
+                    }).then(() => {
+                        axios.post('{{ route('generator.deleteLog')  }}',{id:id}).then(res=> {
+                            if(res.data.errcode==0){
+                               this.getLogs()
+                            }else{
+                                vm.$message.error(res.data.message);
+                            }
+                        });
+                    }).catch(() => {});
+                },
                 //提交generator表单
-                submitForm(formName) {
+                submitForm(formName,submit_type='') {
+
                     let primary_key=this.ruleForm.primary_key;
                     //防止添加字段和主键重复
                     let fieldFlag=this.ruleForm.table_fields.find(function(item){
                         return item.field_name==primary_key
                     });
                     if(fieldFlag){
-                        let message='primary_key: '+primary_key+'@lang('laravel-generator::generator.hasExists') '+'@lang('laravel-generator::generator.delete')' +'@lang('laravel-generator::generator.fieldName')(Field name) '+primary_key
+                        let message='primary_key: '+primary_key+'@lang('laravel-generator::generator.hasExists'),'+'@lang('laravel-generator::generator.delete')' +'@lang('laravel-generator::generator.fieldName')(Field name) '+primary_key
                         this.$message.error(message);
                         return;
                     }
+                    this.ruleForm.submit_type = submit_type
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             //获取选中的模板
-                            var check_templates=this.ruleForm.templates;
-                            var generator_templates=[];
+                            let check_templates=this.ruleForm.templates;
+                            let generator_templates=[];
                             //所有可用的模板
                             for (item of this.template_types){
-                                var all_templates=item.templates;
-                                var check_template_ids=check_templates[item['name']];
+                                let all_templates=item.templates;
+                                let check_template_ids=check_templates[item['name']];
                                 for (id of check_template_ids){
-                                        var temp=all_templates.find(function (t) {
+                                        let temp=all_templates.find(function (t) {
                                             return t.id==id;
                                         });
                                         //获取解析的模板数据
-                                        var generator_template={
+                                        let generator_template={
                                             file_real_name:temp.file_real_name,
                                             template:this.getTemplateCode(temp.template,this.getTemplateData())
                                         };
@@ -447,12 +495,12 @@
                             }
                             this.ruleForm.generator_templates=generator_templates;
                             this.loadding=true;
-                            axios.post('{{  \Illuminate\Support\Facades\URL::current() }}',this.ruleForm).then(function(res){
-                                if(res.data.errcode==0){
-                                    var data=res.data.data;
-                                    var message='';
+                            axios.post('{{  route('generator.store') }}',this.ruleForm).then(function(res){
+                                if(res.data.errcode===0){
+                                    const data=res.data.data;
+                                    let message='';
                                     for(x in data){
-                                        message+='<p>'+x+':'+data[x]+"</p><br>";
+                                        message+='<p>'+data[x]+"</p><br>";
                                     }
                                     vm.$message({
                                         title: 'success',
@@ -475,7 +523,6 @@
                                 vm.loadding=false;
                             }).catch((error) => {
                                 vm.loadding=false;
-                                console.log(error);
                                 vm.$message.error(error);
                             });
                         } else {

@@ -8,6 +8,7 @@
 
 namespace Foryoufeng\Generator\Database;
 
+use App\Models\LaravelGeneratorLog;
 use Illuminate\Database\Seeder;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
@@ -24,8 +25,24 @@ class GeneratorSeeder extends Seeder
         $this->addViews();
         //添加路由
         $this->addRoute();
+        // add logs
+        $this->addLogs();
     }
 
+    private function addLogs()
+    {
+        $count = LaravelGeneratorLog::count();
+        if($count === 0){
+            LaravelGeneratorLog::create([
+                'model_name'=>'User',
+                'display_name' =>'User List',
+                'creator' =>'system',
+                'configs' =>json_encode([
+                    'creator'=>'system',
+                ]),
+            ]);
+        }
+    }
     private function addRoute()
     {
         $type = LaravelGeneratorType::firstOrCreate([

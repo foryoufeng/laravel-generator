@@ -7,10 +7,12 @@ Route::namespace('Foryoufeng\Generator')->group(function () {
 
     Route::get($route, 'GeneratorController@index')->name('generator.index');
     Route::get($route.'model/{name?}', 'GeneratorController@dummyValues')->name('generator.dummyValues');
-    Route::post($route, 'GeneratorController@store');
+    Route::post($route, 'GeneratorController@store')->name('generator.store');
     Route::get($route.'template', 'GeneratorTemplateController@index')->name('generator.template.index');
     Route::get($route.'template/update', 'GeneratorTemplateController@update')->name('generator.template.update');
     Route::post($route.'template/save', 'GeneratorTemplateController@save')->name('generator.template.save');
     Route::post($route.'template/delete', 'GeneratorTemplateController@delete')->name('generator.template.delete');
     Route::post($route.'template/updateType', 'GeneratorTemplateController@updateType')->name('generator.template.updateType');
+    Route::get($route.'logs', 'GeneratorController@getLogs')->name('generator.logs');
+    Route::post($route.'log/delete', 'GeneratorController@deleteLog')->name('generator.deleteLog');
 });
