@@ -1,5 +1,5 @@
 <el-tab-pane>
-    <span slot="label"><i class="el-icon-document"></i> migrate </span>
+    <span slot="label"><i class="el-icon-document"></i> @lang('laravel-generator::generator.migrate') </span>
     <el-form label-position="top" :model="migrateForm" :rules="rules" ref="migrateForm" label-width="200px" class="demo-ruleForm">
         <el-form-item label="prefix" prop="prefix">
             <el-input v-model="migrateForm.prefix"  style="float: left;width: 400px;margin-right: 20px"></el-input>
@@ -9,7 +9,6 @@
         </el-form-item>
         <el-form-item >
             <el-checkbox-group v-model="migrateForm.doMigrate">
-                {{--<el-checkbox label="migration">Create migration</el-checkbox>--}}
                 <el-checkbox label="migrate">Run migrate</el-checkbox>
             </el-checkbox-group>
         </el-form-item>

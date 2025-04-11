@@ -1,6 +1,6 @@
 @extends('laravel-generator::layout')
 @section('content')
-    <el-tabs type="border-card" v-model="tab">
+    <el-tabs type="border-card" v-model="tab" @tab-click="clickTab">
         {{--generator logs--}}
         @include('laravel-generator::generator_logs')
         {{--generator--}}
@@ -35,6 +35,9 @@
             el: '#app',
             data:{
                 loadding:false,
+                dialogTableVisible:false,
+                logTitle:'',
+                logRow:{},
                 dbTypes:@json($dbTypes),
                 keys: [
                     {
@@ -238,6 +241,17 @@
                 this.getLogs()
             },
             methods:{
+                logDetail(row){
+                    this.logRow = JSON.parse(row.configs);
+                    this.dialogTableVisible = true
+                    this.logTitle = '@lang('laravel-generator::generator.modelName'):'+row.model_name
+                },
+                clickTab(tab){
+                    if(tab.name ==='log'){
+                        const page = this.logSearch.page
+                        this.getLogs(page)
+                    }
+                },
                 getRuleForm(){
                   return  {
                       id: 0,

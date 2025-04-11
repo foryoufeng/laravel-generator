@@ -6,6 +6,8 @@
  * Time: 7:57 PM
  */
 return [
+    'migrate'=>'迁移',
+    'generator'=>'生成器',
     'creator'=>'创建人',
     'modelName'=>'Model名称',
     'generateLog'=>'生成记录',

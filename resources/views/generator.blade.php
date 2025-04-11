@@ -1,5 +1,5 @@
 <el-tab-pane  name="generator">
-    <span slot="label"><i class="el-icon-circle-plus-outline"></i> generator</span>
+    <span slot="label"><i class="el-icon-circle-plus-outline"></i> @lang('laravel-generator::generator.generator')</span>
     <el-form label-position="top" :model="ruleForm"  status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="@lang('laravel-generator::generator.modelName')" prop="modelName" style="margin-bottom: 5px">
             <el-input v-model="ruleForm.modelName"  style="float: left;width: 400px;margin-right: 20px"></el-input>

@@ -6,6 +6,8 @@
  * Time: 7:57 PM
  */
 return [
+     'migrate'=>'Migrate',
+     'generator'=>'Generator',
      'creator'=>'Creator',
      'modelName'=>'Model Name',
      'generateLog'=>'Generate Logs',
