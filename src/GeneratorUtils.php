@@ -244,15 +244,15 @@ public $timestamps = false;
             'snakePluralClassName' => 'laravel_generators',
             'tableFields' => [
                 [
-                    'field_name' => 'id',
-                    'field_display_name' => 'Id',
+                    'field_name' => 'user_id',
+                    'field_display_name' => 'User Id',
                     'type' => 'integer',
                     'attach' => '',
                     'nullable' => false,
                     'key' => '',
                     'is_show_lists' => true,
                     'can_search' => true,
-                    'rule'=>'string'
+                    'rule'=>'numeric'
                 ],
                 [
                     'field_name' => 'name',

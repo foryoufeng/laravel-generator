@@ -8,6 +8,7 @@
 
 namespace Foryoufeng\Generator\Database;
 
+use Foryoufeng\Generator\GeneratorUtils;
 use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Illuminate\Database\Seeder;
 use Foryoufeng\Generator\Models\LaravelGenerator;
@@ -33,12 +34,22 @@ class GeneratorSeeder extends Seeder
     {
         $count = LaravelGeneratorLog::count();
         if($count === 0){
+            $generators = GeneratorUtils::getGenerators();
             LaravelGeneratorLog::create([
                 'model_name'=>'User',
                 'display_name' =>'User List',
                 'creator' =>'system',
                 'configs' =>json_encode([
-                    'creator'=>'system',
+                    'modelName'=>'User',
+                    'modelDisplayName'=>'User List',
+                    'foreigns'=>[],
+                    'create' => [
+                        'migration',"migrate","ide-helper"
+                    ],
+                    'primary_key' => 'id',
+                    'timestamps' => true,
+                    'soft_deletes' => false,
+                    'tableFields' => $generators['tableFields'],
                 ]),
             ]);
         }
@@ -53,7 +64,7 @@ class GeneratorSeeder extends Seeder
         ]);
         if (!$generator->exists) {
             $generator->path = 'routes/';
-            $generator->file_name = 'web.php';
+            $generator->file_name = 'admin.php';
             $generator->is_checked = 1;
             $generator->template = $this->getRouteTemplate();
             $generator->template_id = $type->id;
@@ -65,9 +76,9 @@ class GeneratorSeeder extends Seeder
     {
         return <<<stub
 <?php
-Route::get('DummySnakeClass','Admin\DummyClassController@index')->name('admin.DummySnakeClass.index');
-Route::match(['get', 'post'],'DummySnakeClass/update','Admin\DummyClassController@update')->name('admin.DummySnakeClass.update');
-Route::post('DummySnakeClass/delete','Admin\DummyClassController@delete')->name('admin.DummySnakeClass.delete');
+Route::get('DummySnakeClass','DummyClassController@index')->name('admin.DummySnakeClass.index');
+Route::post('DummySnakeClass/update','DummyClassController@update')->name('admin.DummySnakeClass.update');
+Route::post('DummySnakeClass/delete','DummyClassController@delete')->name('admin.DummySnakeClass.delete');
 stub;
 
     }
@@ -128,8 +139,8 @@ stub;
         ]);
         $viewTemp = $this->getViewsTemplate();
         if (!$generator->exists) {
-            $generator->path = 'resources/views/home/DummySnakeClass/';
-            $generator->file_name = 'index.blade.php';
+            $generator->path = 'resources/views/admin/DummySnakeClass/';
+            $generator->file_name = 'index.vue';
             $generator->is_checked = 1;
             $generator->template = $viewTemp['index'];
             $generator->template_id = $type->id;
@@ -139,8 +150,8 @@ stub;
             'name' => 'update_view',
         ]);
         if (!$generator->exists) {
-            $generator->path = 'resources/views/home/DummySnakeClass/';
-            $generator->file_name = 'update.blade.php';
+            $generator->path = 'resources/views/admin/DummySnakeClass/';
+            $generator->file_name = 'update.vue';
             $generator->is_checked = 1;
             $generator->template = $viewTemp['update'];
             $generator->template_id = $type->id;
@@ -160,76 +171,90 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\DummyClass;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 /**
  * DummyDisplayName
  */
 class DummyClassController extends Controller
 {
 
-    public function index(Request \$request)
+    public function index(Request \$request): JsonResponse
     {
-        if(\$request->expectsJson()){
-           \$name=\$request->get('content');
-            \$title=\$request->get('title');
-            \$query=DummyClass::orderByDesc('id');
-            if(\$name){
-                \$query=\$query->where('content','like','%'.\$name.'%');
-            }
-            if(\$title){
-                \$query=\$query->where('title','like','%'.\$title.'%');
-            }
+           \$create_start_time = \$request->get('create_start_time');
+           \$create_end_time = \$request->get('create_end_time');
+           <%for(item of DummyTableFields){%>
+        <%if(item.can_search) { %>
+            <%if(item.rule=='numeric') { %>
+             \$<%=item.field_name%> = (int)\$request->get('<%=item.field_name%>');
+             <%}else{%>
+             \$<%=item.field_name%> = \$request->get('<%=item.field_name%>');
+             <%}%>
+         <%}%>
+        <%}%>
+           \$data = DummyClass::orderByDesc('id')
+    <%for(item of DummyTableFields){%>
+        <%if(item.can_search) { %>
+             <%if(item.rule=='string') { %>
+                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>', 'like', "%{\$<%=item.field_name%>}%"))
+             <%}else if(item.rule=='numeric'){%>
+                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>',  \$<%=item.field_name%>))
+             <%}else{%>
+                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>', 'like', "%{\$<%=item.field_name%>}%"))
+             <%}%>
+         <%}%>
+        <%}%>
+                    ->when(\$create_start_time, fn (Builder \$query) => \$query->where('created_at', '>=', \$create_start_time))
+                    ->when(\$create_end_time, fn (Builder \$query) => \$query->where('created_at', '<=', \$create_end_time))
+                    ->paginate();
 
-            return response()->json(['message' => 'success', 'errcode' => 0, 'data' => \$query->paginate()->toArray()]);
-        }
-        return view('admin.DummySnakeClass.index');
-    }
+            \$data->getCollection()->transform(function (DummyClass \$DummySnakeClass){
+                //\$DummySnakeClass->setAttribute('id', 'ID');
 
-    public function show(Request \$request)
-    {
-        \$DummySnakeClass=DummyClass::find(1);
+                return \$DummySnakeClass;
+            });
 
-        return view('admin.DummySnakeClass.show',[
-            'item'=>\$DummySnakeClass
-        ]);
+            return response()->json(['message' => 'success', 'errcode' => 0, 'data' => \$data->toArray()]);
     }
 
     public function update(Request \$request)
     {
-        \$id=(int)\$request->get('id');
-        \$DummySnakeClass=null;
+        \$id = (int)\$request->get('id');
+        \$DummySnakeClass = null;
         if(\$id){
-            \$DummySnakeClass=DummyClass::whereId(\$id)->first();
+            \$DummySnakeClass = DummyClass::whereId(\$id)->first();
         }
-        if(\$request->expectsJson()){
-            \$data=\$request->validate([
-                'id' => 'required|int',
-                'name'=>'required',
-            ]);
-
-            if(!\$DummySnakeClass){
-                \$DummySnakeClass=new DummyClass();
-            }
-            \$DummySnakeClass->fill(\$data);
-            if(\$DummySnakeClass->save()){
-                return response()->json(['message' => '保存成功', 'errcode' => 0, 'data' => []]);
-            }
-            return response()->json(['message' => '保存失败', 'errcode' => 1, 'data' => []]);
-        }
+        \$data=\$request->validate([
+            'id' => 'required|int',
+            <%for(item of DummyTableFields){%>
+                 <%if(item.rule=='string' && item.nullable==false) { %>
+             '<%=item.field_name%>'=>'required',
+                 <%}%>
+            <%}%>
+        ],[],[
+            'id' => 'ID',
+            <%for(item of DummyTableFields){%>
+                 <%if(item.rule=='string') { %>
+             '<%=item.field_name%>'=>'<%=item.field_display_name%>',
+                 <%}%>
+            <%}%>
+        ]);
 
         if(!\$DummySnakeClass){
-            \$DummySnakeClass=[
-                'id'=>0,
-                'name'=>''
-            ];
+            \$DummySnakeClass=new DummyClass();
         }
-        return view('admin.DummySnakeClass.update',compact('DummySnakeClass'));
+        \$DummySnakeClass->fill(\$data);
+        if(\$DummySnakeClass->save()){
+            return response()->json(['message' => '保存成功', 'errcode' => 0, 'data' => []]);
+        }
+        return response()->json(['message' => '保存失败', 'errcode' => 1, 'data' => []]);
     }
 
     public function delete(Request \$request)
     {
-        \$id=(int)\$request->get('id');
-        \$DummySnakeClass=DummyClass::whereId(\$id)->first();
+        \$id = (int)\$request->get('id');
+        \$DummySnakeClass = DummyClass::whereId(\$id)->first();
         if(\$DummySnakeClass && \$DummySnakeClass->delete()){
             return response()->json(['message' => '删除成功', 'errcode' => 0, 'data' => []]);
         }
@@ -249,12 +274,10 @@ stub;
     private function getViewsTemplate()
     {
         $index_temp = <<<stub
-@extends('laravel-generator::layout')
+<script>
 
-@section('content')
-        <p>
-            DummyDisplayName列表
-        </p>
+</script>
+<template>
         <el-form ref="form" :model="form" label-width="60px">
             <el-row>
                 <%for(item of DummyTableFields){%>
@@ -320,77 +343,15 @@ stub;
             </el-pagination>
         </div>
     </el-footer>
-
-@endsection
-
-@section('js')
-    <script>
-           var vm = new Vue({
-             el: '#app',
-             data: {
-                 //搜索信息
-                 form: {
-                     content: '',
-                     title: '',
-                     page: 1,
-                 },
-                 pageInfo:{},//分页信息
-                 tableData: [],//表数据信息
-                 loading:true
-             },
-             methods: {
-                 //加载列表数据
-                 getData(page=1){
-                     this.form.page=page;
-                     this.loading=true;
-                     //this.doGet is defined in the laravel-generator::layout
-                     this.doGet('{{ route('home.DummySnakeClass.index') }}',this.form).then(res => {
-                         if(res.errcode==0){
-                             this.tableData=res.data.data;
-                             this.setPageInfo(res.data);
-                         }
-                         this.loading=false;
-                     });
-                 },
-                 //设置分页数据
-                 setPageInfo(pageInfo){
-                    this.pageInfo.total=pageInfo.total;
-                    this.pageInfo.per_page=pageInfo.per_page;
-                    this.pageInfo.current_page=pageInfo.current_page;
-                 },
-                 //跳转分页的处理
-                 handlePage(val){
-                     this.getData(val);
-                 },
-                 //删除
-                 handelDelete(id){
-                     this.\$confirm('确认删除吗？', '提示', {
-                         confirmButtonText: '确定',
-                         cancelButtonText: '取消',
-                         type: 'warning'
-                     }).then(() => {
-                         this.doPost('{{ route('home.DummySnakeClass.delete') }}',{id:id}).then(res => {
-                             if(res.errcode==0){
-                                 this.getData();
-                             }else{
-                                 this.\$message.error(res.message);
-                             }
-                         });
-                     }).catch(() => {});
-                 },
-             },
-             mounted(){
-                 this.getData();
-             }
-           })
-
-    </script>
-@endsection
+</template>
+<style scoped lang="scss">
+</style>
 stub;
         $update_temp = <<<stub
-@extends('laravel-generator::layout')
+<script>
 
-@section('content')
+</script>
+<template>
     <div class="box-header">
         <el-header  id="content-header">
             <el-breadcrumb separator-class="el-icon-arrow-right">
@@ -413,57 +374,9 @@ stub;
             </el-form>
         </el-main>
     </div>
-@endsection
-
-@section('js')
-    <script>
-        var vm = new Vue({
-            el: '#app',
-            data: function(){
-
-                return {
-                    submitLoading:false,
-                    form:@json(\$DummySnakeClass),
-                    rules: {
-                        <%for(item of DummyTableFields){%>
-                            <%if(item.rule=='string') { %>
-                        '<%=item.field_name%>':[
-                           { required: true, message: '请输入<%=item.field_display_name%>', trigger: 'blur' },
-                        ],
-                            <%}%>
-                        <%}%>
-                    },
-                }
-            },
-            methods: {
-                onSubmit(form) {
-                    this.\$refs[form].validate((valid) => {
-                        if (valid) {
-                            this.submitLoading=true;
-                            this.doPost('{{ route('home.DummySnakeClass.update') }}',this.form).then(res=>{
-                                this.submitLoading=false;
-                                if(res.errcode==0){
-                                    this.\$message.success('操作成功!');
-                                    window.location.href='{{ route('home.DummySnakeClass.index') }}';
-                                }else{
-                                    this.\$message.error(res.msg);
-                                }
-                            });
-                        } else {
-                            console.log('sub error');
-                            return false;
-                        }
-                    });
-                },
-
-            },
-            mounted(){
-
-             }
-        });
-
-    </script>
-@endsection
+</template>>
+<style scoped lang="scss">
+</style>
 stub;
 
         return [
