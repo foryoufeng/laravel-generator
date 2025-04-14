@@ -41,7 +41,7 @@
                 dbTypes:@json($dbTypes),
                 keys: [
                     {
-                    value: '',
+                    value: 'null',
                     label: 'NULL'
                 }, {
                     value: 'unique',
@@ -49,6 +49,15 @@
                 }, {
                     value: 'index',
                     label: 'index'
+                }
+                ],
+                language_value:'{{$language_value}}',
+                language_options: [{
+                    value: 'zh-CN',
+                    label: '简体中文'
+                }, {
+                    value: 'en',
+                    label: 'English'
                 }
                 ],
                 //外键约束关系
@@ -241,6 +250,9 @@
                 this.getLogs()
             },
             methods:{
+                handleCommand(command){
+                    window.location.href = '{{ route('generator.index') }}/'+command
+                },
                 logDetail(row){
                     this.logRow = JSON.parse(row.configs);
                     this.dialogTableVisible = true

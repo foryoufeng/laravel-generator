@@ -71,12 +71,13 @@
         </el-table-column>
 
     </el-table>
-    <div style="margin-top: 20px; text-align: center;">
+    <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <span>@lang('laravel-generator::generator.total') @{{ pageInfo.total }} @lang('laravel-generator::generator.line')</span>
         <el-pagination
             @current-change="handlePage"
             :current-page.sync="pageInfo.current_page"
             :page-size="pageInfo.per_page"
-            layout="total, prev, pager, next"
+            layout="prev, pager, next"
             :total="pageInfo.total">
         </el-pagination>
     </div>

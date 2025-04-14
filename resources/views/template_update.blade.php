@@ -295,6 +295,15 @@
                   editor:{},
                   editor2:{},
                   template:'',
+                  language_value:'{{$language_value}}',
+                  language_options: [{
+                      value: 'zh-CN',
+                      label: '简体中文'
+                  }, {
+                      value: 'en',
+                      label: 'English'
+                  }
+                  ],
                   template_types:@json($template_types),
                   laravel_generators:@json($laravel_generators),
                   dummyAttrs:@json($dummyAttrs),
@@ -325,6 +334,9 @@
               }
           },
           methods: {
+              handleCommand(command){
+                  window.location.href = '{{ route('generator.index') }}/'+command
+              },
               showForm(id,index){
                   this.labelsVisible = true
                   this.labelForm.id = id;

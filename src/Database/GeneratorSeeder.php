@@ -156,7 +156,7 @@ stub;
         $homeTemp = <<<stub
 <?php
 
-namespace App\Http\Controllers\Home;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\DummyClass;
 use Illuminate\Http\Request;
@@ -483,6 +483,7 @@ stub;
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 <%* soft delete *%>
 <%if(DummyModelFields.soft_deletes){%>
@@ -492,6 +493,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class DummyClass extends Model
 {
 
+    /** @use HasFactory<\Database\Factories\DummyClassFactory> */
+    use HasFactory;
 <%if(DummyModelFields.soft_deletes){%>
      use SoftDeletes;
 <%}%>

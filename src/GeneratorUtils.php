@@ -22,19 +22,38 @@ class GeneratorUtils
      *
      * @return array
      */
-    public static function getTables()
+    public static function getTables(): array
     {
         $info = [];
-        $tables = Schema::getConnection()->getSchemaBuilder()->getTables();
+        $driver = DB::getDriverName();
         $database = DB::getConfig('database');
         $prefix = DB::getConfig('prefix');
-        $tables = array_column($tables, 'Tables_in_'.$database);
-        foreach ($tables as $k => $table) {
-            if ($prefix) {
-                $table = str_replace($prefix, '', $table);
-            }
-            $info[$k]['name'] = $table;
-            $info[$k]['columns'] = Schema::getColumnListing($table);
+
+        $tableNames = match ($driver) {
+            'sqlite' => array_map(
+                fn($row) => $row->name,
+                DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+            ),
+
+            'mysql' => array_map(
+                fn($row) => $row->{"Tables_in_$database"},
+                DB::select("SHOW TABLES")
+            ),
+
+            'pgsql' => array_map(
+                fn($row) => $row->tablename,
+                DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
+            ),
+
+            default => throw new \RuntimeException("Unsupported DB driver: $driver"),
+        };
+
+        foreach ($tableNames as $table) {
+            $cleanName = $prefix ? str_replace($prefix, '', $table) : $table;
+            $info[] = [
+                'name' => $cleanName,
+                'columns' => Schema::getColumnListing($table),
+            ];
         }
 
         return $info;

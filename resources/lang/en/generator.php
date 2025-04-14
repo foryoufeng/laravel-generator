@@ -60,6 +60,8 @@ return [
      'submitSuccess'=>'submit success',
      'namespace'=>'namespace',
      'template'=>'template',
+     'total'=>'Total',
+     'line'=>' ',
      'tableInfo'=>'Table Info',
      'tableFields'=>'Table Fields',
      'required'=>'is required',

@@ -16,7 +16,7 @@
                 </el-option>
             </el-select>
             <el-button type="primary" @click="getData()" icon="el-icon-search" style="float: left;margin-left: 10px"></el-button>
-            <a href="{{ route('generator.template.update') }}" target="_blank">
+            <a href="{{ route('generator.template.update',['locale'=>$locale]) }}" target="_blank">
                 <el-button type="danger" icon="el-icon-plus" style="float: left;margin-left: 10px">{{ trans('laravel-generator::generator.add') }}</el-button>
             </a>
         </el-form-item>
@@ -57,7 +57,7 @@
                 label="{{ trans('laravel-generator::generator.actions') }}"
                 width="200">
             <template slot-scope="scope">
-                <a :href="'{{ route('generator.template.update') }}?id='+scope.row.id" target="_blank">
+                <a :href="'{{ route('generator.template.update',['locale'=>$locale]) }}?id='+scope.row.id" target="_blank">
                     <el-button type="primary" icon="el-icon-edit" circle></el-button>
                 </a>
                 <el-button v-if="'Model'!=scope.row.template_type.name" @click="deleteTemplate(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>

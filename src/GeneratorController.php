@@ -9,11 +9,12 @@
 
 namespace Foryoufeng\Generator;
 
-use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGenerator;
+use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
@@ -26,11 +27,16 @@ class GeneratorController extends BaseController
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request, ?string $locale = null)
     {
+        $locale = $locale ?? config('app.locale', 'en');
+        if (! in_array($locale, ['en', 'zh-CN'])) {
+            $locale = 'en';
+        }
+        App::setLocale($locale);
         $generator = config('generator');
         // 设置展示的tab
-        $tab = $request->get('tab','log');
+        $tab = $request->get('tab', 'log');
         // 获取所有的表
         $tables = GeneratorUtils::getTables();
         // 获取可用的数据类型
@@ -45,8 +51,9 @@ class GeneratorController extends BaseController
         $dummyAttrs = GeneratorUtils::getDummyAttrs();
         // 自定义变量
         $customDummys = config('generator.customDummys');
+        $language_value = $locale === 'en' ? 'English' : '简体中文';
 
-        return view('laravel-generator::index', compact('dbTypes', 'generator',
+        return view('laravel-generator::index', compact('dbTypes', 'generator', 'language_value', 'locale',
             'tab', 'template_types', 'dummyAttrs', 'tables', 'rules', 'modelInfo', 'customDummys'));
     }
 
@@ -82,21 +89,22 @@ class GeneratorController extends BaseController
             'generator_templates' => 'array',
         ]);
         $id = $data['id'];
-        if($id>0){
+        if ($id > 0) {
             $log = LaravelGeneratorLog::findOrFail($id);
-        }else{
-            $log = new LaravelGeneratorLog();
+        } else {
+            $log = new LaravelGeneratorLog;
         }
         $item['model_name'] = $data['modelName'];
         $item['display_name'] = $data['modelDisplayName'];
-        $item['creator'] = config('generator.customDummys.DummyAuthor','');
+        $item['creator'] = config('generator.customDummys.DummyAuthor', '');
         $item['configs'] = json_encode($request->except('id'));
         $log->fill($item);
         $res = $log->save();
-        if($data['submit_type'] === 'save'){
-            if($res){
+        if ($data['submit_type'] === 'save') {
+            if ($res) {
                 return $this->success(['save success']);
             }
+
             return $this->error('save error');
         }
         // 获取模型的信息

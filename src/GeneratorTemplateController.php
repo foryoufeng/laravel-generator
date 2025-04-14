@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: wuqiang
@@ -8,10 +9,11 @@
 
 namespace Foryoufeng\Generator;
 
-use Illuminate\Http\Request;
 use Foryoufeng\Generator\Models\LaravelGenerator;
-use Illuminate\Routing\Controller as BaseController;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 
 /**
@@ -24,7 +26,6 @@ class GeneratorTemplateController extends BaseController
     /**
      * 返回ajax列表数据.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -46,36 +47,40 @@ class GeneratorTemplateController extends BaseController
     /**
      * 更新操作.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function update(Request $request)
+    public function update(Request $request, ?string $locale = null)
     {
-        //do ajax request
+        $locale = $locale ?? config('app.locale', 'en');
+        if (! in_array($locale, ['en', 'zh-CN'])) {
+            $locale = 'en';
+        }
+        App::setLocale($locale);
+        // do ajax request
         $id = (int) $request->get('id');
-        //表单数据
+        // 表单数据
         $form = $this->getForm($id);
-        //获取模板组列表
+        // 获取模板组列表
         $template_types = $this->getTemplateTypes();
-        //提供的演示数据
+        // 提供的演示数据
         $laravel_generators = GeneratorUtils::getGenerators();
-        //可用的假属性字段
+        // 可用的假属性字段
         $dummyAttrs = GeneratorUtils::getDummyAttrs();
-        //可用的函数
+        // 可用的函数
         $functions = GeneratorUtils::getFunctions();
-        //自定义变量
-        $customDummys=config('generator.customDummys',[]);
+        // 自定义变量
+        $customDummys = config('generator.customDummys', []);
         $tags = config('generator.tags');
+        $language_value = $locale === 'en' ? 'English' : '简体中文';
 
-        return view('laravel-generator::template_update', compact('template_types','tags',
-                             'laravel_generators', 'dummyAttrs', 'functions', 'form','customDummys'));
+        return view('laravel-generator::template_update', compact('template_types', 'tags', 'locale', 'language_value',
+            'laravel_generators', 'dummyAttrs', 'functions', 'form', 'customDummys'));
     }
 
     /**
      * 删除操作.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -84,13 +89,13 @@ class GeneratorTemplateController extends BaseController
         $id = (int) $request->get('id');
         $generator = LaravelGenerator::with('template_type')->find($id);
         if ($generator) {
-            if (LaravelGeneratorType::MODEL == $generator->template_type->name) {
+            if ($generator->template_type->name == LaravelGeneratorType::MODEL) {
                 return $this->error(trans('laravel-generator::generator.modelNotDelete'));
             }
             if ($generator->delete()) {
                 $count = LaravelGenerator::where('template_id', $generator->template_id)->count();
                 //
-                if (0 == $count) {
+                if ($count == 0) {
                     LaravelGeneratorType::whereId($generator->template_id)->delete();
                 }
 
@@ -105,20 +110,20 @@ class GeneratorTemplateController extends BaseController
     {
         $name = $request->get('name');
         $id = $request->get('id');
-        if($id>0){
+        if ($id > 0) {
             $generator_type = LaravelGeneratorType::whereId($id)->first();
-        }else{
-            $generator_type = new LaravelGeneratorType();
+        } else {
+            $generator_type = new LaravelGeneratorType;
         }
         $generator_type->name = $name;
         $generator_type->save();
 
         return $this->success($generator_type->toArray());
     }
+
     /**
      * 保存数据.
      *
-     * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -137,8 +142,8 @@ class GeneratorTemplateController extends BaseController
             'file_name' => 'required',
             'template' => 'required',
         ]);
-        if (!$data['id']) {
-            $generator = new LaravelGenerator();
+        if (! $data['id']) {
+            $generator = new LaravelGenerator;
         } else {
             $generator = LaravelGenerator::findOrFail($data['id']);
         }
@@ -158,7 +163,7 @@ class GeneratorTemplateController extends BaseController
      */
     private function getTemplateTypes()
     {
-        return  LaravelGeneratorType::all()->map(function ($item) {
+        return LaravelGeneratorType::all()->map(function ($item) {
             $data = [];
             $data['label'] = $item->name;
             $data['value'] = $item->id;
@@ -170,7 +175,6 @@ class GeneratorTemplateController extends BaseController
     /**
      * 获取模板数据.
      *
-     * @param $id
      *
      * @return array
      */
