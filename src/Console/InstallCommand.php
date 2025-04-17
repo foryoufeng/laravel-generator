@@ -34,6 +34,6 @@ class InstallCommand extends Command
         $this->call('db:seed', ['--class' => GeneratorSeeder::class]);
         $this->info('Generator installed successfully.');
         $host = config('app.url');
-        $this->info('🌐 access url: ' . trim($host,'/').'/generator');
+        $this->info('🌐 access url: ' . route('generator.index'));
     }
 }
