@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'name' => 'Laravel-generator',
-    //the url to access
-    'route'=>'generator',
-    //the rule  can be used by the field
+    'name' => 'Laravel Generator',
+    // the url to access
+    'route'=>'laravel-generator',
+    // the rule  can be used by the field
     'rules'=>[
         'string',
         'email',
@@ -46,8 +46,7 @@ return [
             'type'=>'success',
         ]
     ],
-    //difine your custom value
     'customDummys'=>[
-        'DummyAuthor'=>env('DUMMY_AUTHOR','foryoufeng')
+        'DummyAuthor'=>env('GENERATOR_AUTHOR','system')
     ]
 ];

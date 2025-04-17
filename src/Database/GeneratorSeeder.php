@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: wuqiang
@@ -9,22 +10,22 @@
 namespace Foryoufeng\Generator\Database;
 
 use Foryoufeng\Generator\GeneratorUtils;
-use Foryoufeng\Generator\Models\LaravelGeneratorLog;
-use Illuminate\Database\Seeder;
 use Foryoufeng\Generator\Models\LaravelGenerator;
+use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
+use Illuminate\Database\Seeder;
 
 class GeneratorSeeder extends Seeder
 {
     public function run()
     {
-        //添加模型
+        // 添加模型
         $this->addModel();
-        //添加控制器
+        // 添加控制器
         $this->addControllers();
-        //添加视图
+        // 添加视图
         $this->addViews();
-        //添加路由
+        // 添加路由
         $this->addRoute();
         // add logs
         $this->addLogs();
@@ -33,27 +34,30 @@ class GeneratorSeeder extends Seeder
     private function addLogs()
     {
         $count = LaravelGeneratorLog::count();
-        if($count === 0){
+        if ($count === 0) {
             $generators = GeneratorUtils::getGenerators();
             LaravelGeneratorLog::create([
-                'model_name'=>'User',
-                'display_name' =>'User List',
-                'creator' =>'system',
-                'configs' =>json_encode([
-                    'modelName'=>'User',
-                    'modelDisplayName'=>'User List',
-                    'foreigns'=>[],
+                'model_name' => 'User',
+                'display_name' => 'User List',
+                'creator' => 'system',
+                'configs' => json_encode([
+                    'modelName' => 'User',
+                    'modelDisplayName' => 'User List',
+                    'foreigns' => [],
+                    'relationships' => [],
+                    'templates' => [],
                     'create' => [
-                        'migration',"migrate","ide-helper"
+                        'migration', 'migrate', 'ide-helper',
                     ],
                     'primary_key' => 'id',
                     'timestamps' => true,
                     'soft_deletes' => false,
-                    'tableFields' => $generators['tableFields'],
+                    'table_fields' => $generators['tableFields'],
                 ]),
             ]);
         }
     }
+
     private function addRoute()
     {
         $type = LaravelGeneratorType::firstOrCreate([
@@ -62,7 +66,7 @@ class GeneratorSeeder extends Seeder
         $generator = LaravelGenerator::firstOrNew([
             'name' => 'route',
         ]);
-        if (!$generator->exists) {
+        if (! $generator->exists) {
             $generator->path = 'routes/';
             $generator->file_name = 'admin.php';
             $generator->is_checked = 1;
@@ -74,7 +78,7 @@ class GeneratorSeeder extends Seeder
 
     private function getRouteTemplate()
     {
-        return <<<stub
+        return <<<'stub'
 <?php
 Route::get('DummySnakeClass','DummyClassController@index')->name('admin.DummySnakeClass.index');
 Route::post('DummySnakeClass/update','DummyClassController@update')->name('admin.DummySnakeClass.update');
@@ -82,6 +86,7 @@ Route::post('DummySnakeClass/delete','DummyClassController@delete')->name('admin
 stub;
 
     }
+
     /**
      * add Model.
      */
@@ -93,7 +98,7 @@ stub;
         $generator = LaravelGenerator::firstOrNew([
             'name' => 'model',
         ]);
-        if (!$generator->exists) {
+        if (! $generator->exists) {
             $generator->path = 'app/Models';
             $generator->file_name = 'DummyClass.php';
             $generator->is_checked = 1;
@@ -115,7 +120,7 @@ stub;
             'name' => 'Admin Controller',
         ]);
         $controllerTemps = $this->getControllersTemplate();
-        if (!$generator->exists) {
+        if (! $generator->exists) {
             $generator->path = 'app/Http/Controllers/Admin/';
             $generator->file_name = 'DummyClassController.php';
             $generator->is_checked = 1;
@@ -138,7 +143,7 @@ stub;
             'name' => 'index_view',
         ]);
         $viewTemp = $this->getViewsTemplate();
-        if (!$generator->exists) {
+        if (! $generator->exists) {
             $generator->path = 'resources/views/admin/DummySnakeClass/';
             $generator->file_name = 'index.vue';
             $generator->is_checked = 1;
@@ -149,7 +154,7 @@ stub;
         $generator = LaravelGenerator::firstOrNew([
             'name' => 'update_view',
         ]);
-        if (!$generator->exists) {
+        if (! $generator->exists) {
             $generator->path = 'resources/views/admin/DummySnakeClass/';
             $generator->file_name = 'update.vue';
             $generator->is_checked = 1;
@@ -175,7 +180,10 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 /**
+ *
  * DummyDisplayName
+ * author : DummyAuthor
+ * created_at : DummyCurrentTime
  */
 class DummyClassController extends Controller
 {
@@ -273,10 +281,7 @@ stub;
      */
     private function getViewsTemplate()
     {
-        $index_temp = <<<stub
-<script>
-
-</script>
+        $index_temp = <<<'stub'
 <template>
         <el-form ref="form" :model="form" label-width="60px">
             <el-row>
@@ -344,13 +349,17 @@ stub;
         </div>
     </el-footer>
 </template>
+<script>
+import { ref, reactive, onMounted } from 'vue'
+
+onMounted( () => {
+
+})
+</script>
 <style scoped lang="scss">
 </style>
 stub;
-        $update_temp = <<<stub
-<script>
-
-</script>
+        $update_temp = <<<'stub'
 <template>
     <div class="box-header">
         <el-header  id="content-header">
@@ -375,6 +384,13 @@ stub;
         </el-main>
     </div>
 </template>>
+<script>
+import { ref, reactive, onMounted } from 'vue'
+
+onMounted( () => {
+
+})
+</script>
 <style scoped lang="scss">
 </style>
 stub;

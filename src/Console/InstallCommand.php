@@ -29,10 +29,11 @@ class InstallCommand extends Command
      */
     public function handle()
     {
-        $this->call('vendor:publish', ['--provider' => GeneratorServiceProvider::class]);
-
         $this->call('migrate');
         //add default seeds
         $this->call('db:seed', ['--class' => GeneratorSeeder::class]);
+        $this->info('Generator installed successfully.');
+        $host = config('app.url');
+        $this->info('🌐 access url: ' . trim($host,'/').'/generator');
     }
 }

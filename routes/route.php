@@ -1,16 +1,22 @@
 <?php
 
+use Foryoufeng\Generator\Controllers\GeneratorController;
+use Foryoufeng\Generator\Controllers\AssetController;
+use Foryoufeng\Generator\Controllers\GeneratorTemplateController;
 use Illuminate\Support\Facades\Route;
 
-Route::namespace('Foryoufeng\Generator')->group(function () {
-    Route::get('generator/{locale?}', 'GeneratorController@index')->name('generator.index') ->where('locale', 'en|zh-CN');
-    Route::get('generator/model/{name?}', 'GeneratorController@dummyValues')->name('generator.dummyValues');
-    Route::post('generator', 'GeneratorController@store')->name('generator.store');
-    Route::get('generator/template', 'GeneratorTemplateController@index')->name('generator.template.index');
-    Route::get('generator/template/update/{locale?}', 'GeneratorTemplateController@update')->name('generator.template.update');
-    Route::post('generator/template/save', 'GeneratorTemplateController@save')->name('generator.template.save');
-    Route::post('generator/template/delete', 'GeneratorTemplateController@delete')->name('generator.template.delete');
-    Route::post('generator/template/updateType', 'GeneratorTemplateController@updateType')->name('generator.template.updateType');
-    Route::get('generator/logs', 'GeneratorController@getLogs')->name('generator.logs');
-    Route::post('generator/log/delete', 'GeneratorController@deleteLog')->name('generator.deleteLog');
+Route::prefix(config('laravel-generator.route'))->group(function () {
+    Route::get('{locale?}', [GeneratorController::class, 'index'])->name('generator.index') ->where('locale', 'en|zh-CN');
+    Route::get('model/{name?}', [GeneratorController::class, 'dummyValues'])->name('generator.dummyValues');
+    Route::post('/', [GeneratorController::class, 'store'])->name('generator.store');
+    Route::post('migrate', [GeneratorController::class, 'migrate'])->name('generator.migrate');
+    Route::get('template', [GeneratorTemplateController::class, 'index'])->name('generator.template.index');
+    Route::get('template/update/{locale?}', [GeneratorTemplateController::class, 'update'])->name('generator.template.update');
+    Route::post('template/save', [GeneratorTemplateController::class, 'save'])->name('generator.template.save');
+    Route::post('template/delete', [GeneratorTemplateController::class, 'delete'])->name('generator.template.delete');
+    Route::post('template/updateType', [GeneratorTemplateController::class, 'updateType'])->name('generator.template.updateType');
+    Route::get('logs', [GeneratorController::class, 'getLogs'])->name('generator.logs');
+    Route::post('log/delete', [GeneratorController::class, 'deleteLog'])->name('generator.deleteLog');
+    Route::get('assets/{path}', AssetController::class)->where('path', '.*');
 });
+

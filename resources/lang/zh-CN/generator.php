@@ -55,6 +55,7 @@ return [
     'name'=>'名称',
     'addTime'=>'添加时间',
     'updateTime'=>'更新时间',
+    'currentTime'=>'当前时间',
     'file'=>'文件',
     'submitError'=>'提交失败',
     'submitSuccess'=>'提交成功',

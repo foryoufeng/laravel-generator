@@ -49,6 +49,9 @@
                                     <i slot="reference" class="el-icon-question"></i>
                                 </el-popover>
                             </el-menu-item>
+                            <el-menu-item index="1-7" @click="insertEditor(dummyAttrs['currentTime'])" >
+                                <span>@lang('laravel-generator::generator.currentTime')</span>
+                            </el-menu-item>
                         </el-menu-item-group>
                         <el-submenu index="1-6">
                             <template slot="title">Table Fields</template>
@@ -278,13 +281,13 @@
     </style>
 @endsection
 @section('js')
-    <link rel="stylesheet" data-name="vs/editor/editor.main" href="/vendor/laravel-generator/vs/editor/editor.main.css">
-    <script src="/vendor/laravel-generator/vs/loader.js"></script>
-    <script src="/vendor/laravel-generator/js/baiduTemplate.js"></script>
-    <script src="/vendor/laravel-generator/vs/editor/editor.main.nls.js"></script>
-    <script src="/vendor/laravel-generator/vs/editor/editor.main.js"></script>
-    <script src="/vendor/laravel-generator/vs/basic-languages/java/java.js"></script>
-    <script src="/vendor/laravel-generator/vs/base/worker/workerMain.js "></script>
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="/laravel-generator/assets/vs/editor/editor.main.css">
+    <script src="/laravel-generator/assets/vs/loader.js"></script>
+    <script src="/laravel-generator/assets/js/baiduTemplate.js"></script>
+    <script src="/laravel-generator/assets/vs/editor/editor.main.nls.js"></script>
+    <script src="/laravel-generator/assets/vs/editor/editor.main.js"></script>
+    <script src="/laravel-generator/assets/vs/basic-languages/java/java.js"></script>
+    <script src="/laravel-generator/assets/vs/base/worker/workerMain.js "></script>
     <script>
         var vm = new Vue({
           el: '#app',
@@ -347,7 +350,6 @@
               },
               updateLabel(){
                   axios.post('{{ route('generator.template.updateType') }}',this.labelForm).then(function(res){
-                      console.log(res);
                       var data=res.data;
                       if(data.errcode==0){
                           vm.labelsVisible = false
@@ -423,7 +425,6 @@
                   this.insertEditor(this.functions[code]);
               },
               addPathName(path,file_name){
-                  console.log(path,file_name);
                 this.form.path=path;
                 this.form.file_name=file_name;
               },
@@ -437,8 +438,7 @@
                           }
                           this.submitDisabled=true;
                           axios.post('{{ route('generator.template.save') }}',this.form).then(function(res){
-                              console.log(res);
-                              var data=res.data;
+                              const data=res.data;
                               if(data.errcode==0){
                                   vm.$message.success('@lang('laravel-generator::generator.submitSuccess')');
                               }else{

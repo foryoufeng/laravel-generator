@@ -19,12 +19,13 @@ class GeneratorServiceProvider extends ServiceProvider
         //the language
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-generator');
 
+        // load migrations
+        $this->loadMigrationsFrom(__DIR__.'/../resources/migrations');
+
         // Publishing generator files.
         $this->publishes([
-            __DIR__.'/../config/generator.php' => config_path('generator.php'),
-            __DIR__.'/../resources/assets' => public_path('vendor/laravel-generator'),
-            __DIR__.'/../resources/migrations' => database_path('migrations'),
-        ]);
+            __DIR__.'/../config/laravel-generator.php' => config_path('laravel-generator.php'),
+        ],'laravel-generator');
 
         //routes
         $this->loadRoutesFrom(__DIR__.'/../routes/route.php');
@@ -41,5 +42,8 @@ class GeneratorServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/laravel-generator.php', 'laravel-generator'
+        );
     }
 }

@@ -29,7 +29,7 @@
     </style>
 @endsection
 @section('js')
-    <script src="/vendor/laravel-generator/js/baiduTemplate.js"></script>
+    <script src="/laravel-generator/assets/js/baiduTemplate.js"></script>
     <script>
         var vm =new Vue({
             el: '#app',
@@ -309,6 +309,12 @@
                 switchTab(tab,ruleForm) {
                     this.tab = tab;
                     this.ruleForm = ruleForm
+                    //选中的模板数据
+                    this.ruleForm.templates = {
+                        @foreach($template_types['datas'] as $templates)
+                        '{{ $templates['name'] }}':@json($templates['checked']),
+                        @endforeach
+                    }
                 },
                 handlePage(val){
                     this.getLogs(val);
@@ -374,9 +380,9 @@
                         soft_deletes:this.ruleForm.soft_deletes,
                     };
                     return {
-                        DummyTableFields:this.ruleForm.table_fields,
+                        DummyTableFields:this.ruleForm.table_fields??[],
                         DummyModelFields:modelFields,
-                        DummyRelationShips:this.ruleForm.relationships,
+                        DummyRelationShips:this.ruleForm.relationships??[],
                     }
                 },
                 /**
@@ -614,7 +620,7 @@
                     this.$refs[migrateForm].validate((valid) => {
                         if (valid) {
                             this.loadding=true;
-                            axios.post('{{  \Illuminate\Support\Facades\URL::current() }}',this.migrateForm).then(function(res){
+                            axios.post('{{  route('generator.migrate') }}',this.migrateForm).then(function(res){
                                 if(res.data.errcode==0){
                                     var data=res.data.data;
                                     var message='';

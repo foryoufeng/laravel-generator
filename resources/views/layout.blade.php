@@ -7,10 +7,10 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Laravel Generator</title>
-    <link rel="icon" type="image/png" href="/vendor/laravel-generator/images/logo.png">
+    <title>{{config('laravel-generator.name','Laravel Generator')}}</title>
+    <link rel="icon" type="image/png" href="/laravel-generator/assets/images/logo.png">
     <!-- Styles -->
-    <link href="/vendor/laravel-generator/css/element.css" rel="stylesheet" type="text/css">
+    <link href="/laravel-generator/assets/css/element.css" rel="stylesheet" type="text/css">
     <style>
         [v-cloak] {
             display: none;
@@ -59,8 +59,8 @@
         <el-container>
             <el-header class="header" style="display: flex; align-items: center; position: relative;">
                 <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center;">
-                    <img src="/vendor/laravel-generator/images/logo.png" style="width: 70px">
-                    <p class="title" style="margin-left: 10px;">Laravel Generator</p>
+                    <img src="/laravel-generator/assets/images/logo.png" style="width: 70px">
+                    <p class="title" style="margin-left: 10px;">{{config('laravel-generator.name','Laravel Generator')}}</p>
                 </div>
                 <div  id="notice" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
                     <a href="https://github.com/foryoufeng/laravel-generator" target="_blank" title="laravel-generator">
@@ -85,14 +85,14 @@
             <el-main>
                 @yield('content')
             </el-main>
-            <el-footer class="footer"> ©Laravel Generator</el-footer>
+            <el-footer class="footer"> ©{{config('laravel-generator.name','Laravel Generator')}}</el-footer>
         </el-container>
     </div>
 </div>
 <!-- Scripts -->
-<script src="/vendor/laravel-generator/js/vue.js"></script>
-<script src="/vendor/laravel-generator/js/axios.js"></script>
-<script src="/vendor/laravel-generator/js/element-2.4.js"></script>
+<script src="/laravel-generator/assets/js/vue.js"></script>
+<script src="/laravel-generator/assets/js/axios.js"></script>
+<script src="/laravel-generator/assets/js/element-2.4.js"></script>
 <script>
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     String.prototype.trim = function (char, type) {

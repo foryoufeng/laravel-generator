@@ -2,14 +2,25 @@
 
 All notable changes to `laravel-generator` will be documented in this file.
 
+* # Version 3.0
+    * Added support for Laravel 12+  / 增加对Laravel 12+ 的支持
+    * Added a record/log panel. / 添加生成记录面板
+    * Modified the default template to Vue 3. / 修改默认模板为vue3
+---
+
 * # Version 2.6
-    * add Laravel 9.0 support  / 增加对Laravel 9.0 的支持
+    * Added support for Laravel 10+  / 增加对Laravel 10+ 的支持
+
+---
+
+* # Version 2.6
+    * Added support for Laravel 9+  / 增加对Laravel 9+ 的支持
     * fix the add create:migrate bug / 修复创建迁移文件报错bug
     * fix the change migrate bug / 修复修改migrate表结构字段报错的bug
 ---
 
 * # Version 2.1
-  * add Laravel 6.0 support  / 增加对Laravel 6.0 的支持
+  * Added support for Laravel 6+  / 增加对Laravel 6+ 的支持
   * fix the primary key add bug / 修复新增字段为主键时引起的报错bug
   * fix the migrate show error cause by add two or more filed / 修复migrate板块添加多个字段时服务器报错的bug
   * fix the Relationships show error cause by add two or more relationship in the generator/ 修复generator板块中添加多个关联关系时服务器报错的bug
@@ -25,4 +36,4 @@ All notable changes to `laravel-generator` will be documented in this file.
 * # Version 1.0
 
 ### Added
-- Everything / 第一个版本
+- First version. / 第一个版本

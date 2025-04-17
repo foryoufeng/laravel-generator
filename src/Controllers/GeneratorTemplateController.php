@@ -7,8 +7,10 @@
  * Time: 7:30 PM.
  */
 
-namespace Foryoufeng\Generator;
+namespace Foryoufeng\Generator\Controllers;
 
+use Foryoufeng\Generator\GeneratorUtils;
+use Foryoufeng\Generator\Message;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
 use Illuminate\Http\Request;
@@ -70,8 +72,8 @@ class GeneratorTemplateController extends BaseController
         // 可用的函数
         $functions = GeneratorUtils::getFunctions();
         // 自定义变量
-        $customDummys = config('generator.customDummys', []);
-        $tags = config('generator.tags');
+        $customDummys = config('laravel-generator.customDummys', []);
+        $tags = config('laravel-generator.tags');
         $language_value = $locale === 'en' ? 'English' : '简体中文';
 
         return view('laravel-generator::template_update', compact('template_types', 'tags', 'locale', 'language_value',

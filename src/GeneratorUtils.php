@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: wuqiang
@@ -8,9 +9,9 @@
 
 namespace Foryoufeng\Generator;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * Class GeneratorUtils.
@@ -19,8 +20,6 @@ class GeneratorUtils
 {
     /**
      * get all of tables in the default database.
-     *
-     * @return array
      */
     public static function getTables(): array
     {
@@ -31,17 +30,17 @@ class GeneratorUtils
 
         $tableNames = match ($driver) {
             'sqlite' => array_map(
-                fn($row) => $row->name,
+                fn ($row) => $row->name,
                 DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
             ),
 
             'mysql' => array_map(
-                fn($row) => $row->{"Tables_in_$database"},
-                DB::select("SHOW TABLES")
+                fn ($row) => $row->{"Tables_in_$database"},
+                DB::select('SHOW TABLES')
             ),
 
             'pgsql' => array_map(
-                fn($row) => $row->tablename,
+                fn ($row) => $row->tablename,
                 DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public'")
             ),
 
@@ -111,6 +110,7 @@ class GeneratorUtils
             'classDisplayName' => 'DummyDisplayName',
             'camelClassName' => 'DummyCamelClass',
             'snakeClassName' => 'DummySnakeClass',
+            'currentTime' => 'DummyCurrentTime',
             'pluralClassName' => 'DummyPluralClass',
             'snakePluralClassName' => 'DummySnakePluralClass',
             'tableFields' => 'DummyTableFields',
@@ -120,17 +120,19 @@ class GeneratorUtils
 
     /**
      * 根据名称获取转换的字段的值
-     * @param $modelName 名称
+     *
+     * @param  $modelName  名称
      * @return array
      */
     public static function getDummyValues($modelName)
     {
         return [
-            'DummyClass'=>$modelName,
-            'DummyCamelClass'=>Str::camel($modelName),
-            'DummySnakeClass'=>Str::snake($modelName),
-            'DummyPluralClass'=>Str::plural($modelName),
-            'DummySnakePluralClass'=>Str::snake(Str::plural($modelName)),
+            'DummyClass' => $modelName,
+            'DummyCurrentTime' => date('Y-m-d H:i:s'),
+            'DummyCamelClass' => Str::camel($modelName),
+            'DummySnakeClass' => Str::snake($modelName),
+            'DummyPluralClass' => Str::plural($modelName),
+            'DummySnakePluralClass' => Str::snake(Str::plural($modelName)),
         ];
     }
 
@@ -142,7 +144,7 @@ class GeneratorUtils
     public static function getFunctions()
     {
         return [
-            //the if
+            // the if
             'if' => '<%if(false) { %>
 
 <%}else{%>
@@ -150,7 +152,7 @@ class GeneratorUtils
 <h2>is else</h2>
 
 <%}%>',
-            //the elseif
+            // the elseif
             'elseif' => '<%if(false) { %>
 
 <%}else if(1==1){%>
@@ -161,12 +163,12 @@ else if
 <h2>is else</h2>
 
 <%}%>',
-            //the for
+            // the for
             'for' => '<%for(var i=0;i<10;i++){%>
 <li><%=i%></li>
 
 <%}%>',
-            //the tableFields
+            // the tableFields
             'tableFields' => '<tr>
 <%for(field of DummyTableFields){%>
     <%if(field.is_show_lists) { %>
@@ -185,32 +187,32 @@ else if
 <tr>
 @endforeach
 ',
-            //the tableFieldsFor
+            // the tableFieldsFor
             'tableFieldsFor' => '<%for(item of DummyTableFields){%>
 <%=item.field_name%>
 <%}%>
 ',
-            //the tableFieldsFor
+            // the tableFieldsFor
             'primary_key' => "<%if('id'!=DummyModelFields.primary_key){%>
 protected \$primaryKey = '<%=DummyModelFields.primary_key%>';
 <%}%>
 ",
-            //the tableFieldsFor
+            // the tableFieldsFor
             'timestamps' => '<%if(!DummyModelFields.timestamps){%>
 public $timestamps = false;
 <%}%>
 ',
-            //the tableFieldsFor
+            // the tableFieldsFor
             'soft_deletes' => '<%if(!DummyModelFields.soft_deletes){%>
 
 <%}%>
 ',
-            //the tableFieldsFor
+            // the tableFieldsFor
             'fillable' => 'protected $fillable = [<%for(item of DummyTableFields){%><%if(\'id\'!=item.field_name) { %>\'<%=item.field_name%>\',<%}%><%}%>];',
 
-            //the var
+            // the var
             'var' => '<%=Template%>',
-            //the rule
+            // the rule
             'rule' => "<%for(field of DummyTableFields){%>
     <%if('file'==field.rule) { %>
     <input type='file' name='<%=field.field_name%>'>
@@ -241,6 +243,7 @@ public $timestamps = false;
             'camelClassName' => 'laravelGenerator',
             'snakeClassName' => 'laravel_generator',
             'pluralClassName' => 'LaravelGenerators',
+            'currentTime' => date('Y-m-d H:i:s'),
             'snakePluralClassName' => 'laravel_generators',
             'tableFields' => [
                 [
@@ -252,7 +255,7 @@ public $timestamps = false;
                     'key' => '',
                     'is_show_lists' => true,
                     'can_search' => true,
-                    'rule'=>'numeric'
+                    'rule' => 'numeric',
                 ],
                 [
                     'field_name' => 'name',
@@ -263,7 +266,7 @@ public $timestamps = false;
                     'key' => 'unique',
                     'is_show_lists' => true,
                     'can_search' => true,
-                    'rule'=>'string'
+                    'rule' => 'string',
                 ],
                 [
                     'field_name' => 'add_time',
@@ -273,7 +276,7 @@ public $timestamps = false;
                     'key' => '',
                     'is_show_lists' => true,
                     'can_search' => true,
-                    'rule'=>'date'
+                    'rule' => 'date',
                 ],
                 [
                     'field_name' => 'upload_file',
@@ -283,7 +286,7 @@ public $timestamps = false;
                     'key' => '',
                     'is_show_lists' => true,
                     'can_search' => false,
-                    'rule'=>'file'
+                    'rule' => 'file',
                 ],
             ],
             'modelFields' => [
@@ -291,18 +294,18 @@ public $timestamps = false;
                 'timestamps' => true,
                 'soft_deletes' => false,
             ],
-            'relationships'=>[
-              [
-                'relationship'=>'belongsTo',
-                'model'=>'LaravelGeneratorType',
-                'camel_model'=>'laravelGeneratorType',
-                'snake_model'=>'laravel_generator_type',
-                'snake_plural_model'=>'laravel_generator_types',
-                'foreign_key'=>'template_id',
-                'reverse'=>'hasMany',
-                'with'=>true,
-                'can_search'=>true
-              ],
+            'relationships' => [
+                [
+                    'relationship' => 'belongsTo',
+                    'model' => 'LaravelGeneratorType',
+                    'camel_model' => 'laravelGeneratorType',
+                    'snake_model' => 'laravel_generator_type',
+                    'snake_plural_model' => 'laravel_generator_types',
+                    'foreign_key' => 'template_id',
+                    'reverse' => 'hasMany',
+                    'with' => true,
+                    'can_search' => true,
+                ],
             ],
         ];
     }

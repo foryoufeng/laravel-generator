@@ -7,8 +7,12 @@
  * Time: 18:19.
  */
 
-namespace Foryoufeng\Generator;
+namespace Foryoufeng\Generator\Controllers;
 
+use Foryoufeng\Generator\FileCreator;
+use Foryoufeng\Generator\GeneratorUtils;
+use Foryoufeng\Generator\Message;
+use Foryoufeng\Generator\MigrationCreator;
 use Foryoufeng\Generator\Models\LaravelGenerator;
 use Foryoufeng\Generator\Models\LaravelGeneratorLog;
 use Foryoufeng\Generator\Models\LaravelGeneratorType;
@@ -34,7 +38,7 @@ class GeneratorController extends BaseController
             $locale = 'en';
         }
         App::setLocale($locale);
-        $generator = config('generator');
+        $generator = config('laravel-generator');
         // 设置展示的tab
         $tab = $request->get('tab', 'log');
         // 获取所有的表
@@ -50,7 +54,7 @@ class GeneratorController extends BaseController
         // 可用的假属性字段
         $dummyAttrs = GeneratorUtils::getDummyAttrs();
         // 自定义变量
-        $customDummys = config('generator.customDummys');
+        $customDummys = config('laravel-generator.customDummys');
         $language_value = $locale === 'en' ? 'English' : '简体中文';
 
         return view('laravel-generator::index', compact('dbTypes', 'generator', 'language_value', 'locale',
@@ -96,7 +100,7 @@ class GeneratorController extends BaseController
         }
         $item['model_name'] = $data['modelName'];
         $item['display_name'] = $data['modelDisplayName'];
-        $item['creator'] = config('generator.customDummys.DummyAuthor', '');
+        $item['creator'] = config('laravel-generator.customDummys.DummyAuthor', '');
         $item['configs'] = json_encode($request->except('id'));
         $log->fill($item);
         $res = $log->save();
@@ -169,7 +173,18 @@ class GeneratorController extends BaseController
                     ]);
                 }
             }
+        } catch (\Exception $exception) {
+            return $this->error($exception->getFile().'-'.$exception->getLine().':'.$exception->getMessage());
+        }
 
+        return $this->success($paths);
+    }
+
+    public function migrate(Request $request)
+    {
+        $doMigrate = $request->get('doMigrate', []);
+        $table_fields = $request->get('table_fields');
+        try {
             // 新增加迁移文件
             if (\in_array('migration', $doMigrate, true)) {
                 $tableName = $request->get('tableName');
@@ -189,13 +204,12 @@ class GeneratorController extends BaseController
                     $paths['migrate'] = $message;
                 }
             }
-        } catch (\Exception $exception) {
-            return $this->error($exception->getFile().'-'.$exception->getLine().':'.$exception->getMessage());
+         } catch (\Exception $exception) {
+             return $this->error($exception->getFile().'-'.$exception->getLine().':'.$exception->getMessage());
         }
 
         return $this->success($paths);
     }
-
     private function dealRelationShips($relationships, $model_name, $modelInfo)
     {
         if ($relationships) {
@@ -234,7 +248,7 @@ class GeneratorController extends BaseController
     private function getRules()
     {
         $rules = [];
-        $configRules = config('generator.rules');
+        $configRules = config('laravel-generator.rules');
         foreach ($configRules as $k => $rule) {
             $rules[$k]['label'] = $rule;
             $rules[$k]['value'] = $rule;

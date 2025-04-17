@@ -1,98 +1,106 @@
-# laravel-generator
+<p align="center">
+<a href="https://generator.pp-lang.tech"><img src="https://generator.pp-lang.tech/laravel-generator-logo2.png" width="400" alt="Laravel Generator"></a>
+</p>
 
-[![Latest Stable Version](https://poser.pugx.org/foryoufeng/laravel-generator/v/stable)](https://packagist.org/packages/foryoufeng/laravel-generator)
-[![Total Downloads](https://poser.pugx.org/foryoufeng/laravel-generator/downloads)](https://packagist.org/packages/foryoufeng/laravel-generator)
-[![License](https://poser.pugx.org/foryoufeng/laravel-generator/license)](https://packagist.org/packages/foryoufeng/laravel-generator)
+<p align="center">
+<a href="https://packagist.org/packages/foryoufeng/laravel-generator"><img src="https://img.shields.io/packagist/dt/foryoufeng/laravel-generator" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/foryoufeng/laravel-generator"><img src="https://img.shields.io/packagist/v/foryoufeng/laravel-generator" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/foryoufeng/laravel-generator"><img src="https://img.shields.io/packagist/l/foryoufeng/laravel-generator" alt="License"></a>
+</p>
 
-## [中文文档](readme_zh_CN.md)
+# Laravel Generator
+A graphical interface code generator for quickly generating code for Laravel applications.
 
-<p align="center">⛵<code>laravel-generator</code> is administrative interface builder for laravel which can help you build code template you want as soon as possiable.</p>
 
-Requirements
-------------
- - PHP >= 7.0.0
- - Laravel >= 5
- 
- # For GUI
-<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/K55cxJl5LK.png!large" alt="laravel-generator">
+# Installation
 
-## [More Docs](https://learnku.com/index.php/docs/laravel-generator-en)
+If you have PHP and Composer installed, you can install the Laravel installer via Composer:
 
-## Installation
-
-Via Composer
-
-``` bash
+```bash
 composer require --dev foryoufeng/laravel-generator
 ```
 
-If you do not run Laravel 5.5 (or higher), then add the service provider in `config/app.php`:
-```
-Foryoufeng\Generator\GeneratorServiceProvider::class
-```
+Run the following command to install the code generator:
 
-Then run the command to install the generator
 ```
 php artisan generator:install
 ```
 
-you may also need install the package `barryvdh/laravel-ide-helper`,if you do not install it
-
+Add the creator's information in the `.env` file:
+```sh
+GENERATOR_AUTHOR=Your Name
 ```
-composer require --dev barryvdh/laravel-ide-helper
+
+Now you can access your application URL `http://localhost:8000/laravel-generator` to use `laravel-generator`.
+
+## Configuration file
+
+Publish configuration file
+
+```sh
+php artisan vendor:publish --tag=laravel-generator
 ```
 
-After run command you can find config file in `config/generator.php`,and now you can access your application `http://yourhost/generator` to use the `laravel-generator`
+`generator.php` file description:
 
-After the installation is complete, the project generates templates such as model, controllers and views by default. Other templates can be added or modified according to the actual needs of the project.
-
-## templates
-
-<img src="https://cdn.learnku.com/uploads/images/202201/08/4476/LUIuNgsgNC.png!large" alt="laravel-generator">
- 
-## Usage
-the `generator.php` doc
-```
+```php
 <?php
-
 return [
-    'name' => 'Laravel-generator',
-    //the url to access
-    'route'=>'generator',//you can change the access url if you do not like it
-     //the rule  can be used by the field  , You can define the format of the fields you need.
-      'rules'=>[
-          'string',
-          'email',
-          'file',
-          'numeric',
-          'array',
-          'alpha',
-          'alpha_dash',
-          'alpha_num',
-          'date',
-          'boolean',
-          'distinct',
-          'phone',
-      ],
+    'name' => 'Laravel Generator',
+    // the url to access
+    'route'=>'laravel-generator',
+    // Define rules
+    'rules' => [
+        'string',
+        'email',
+        'file',
+        'numeric',
+        'array',
+        'alpha',
+        'alpha_dash',
+        'alpha_num',
+        'date',
+        'boolean',
+        'distinct',
+        'phone',
+        'custom'
+    ],
+    // Set labels
+    'tags' => [
+        [
+            'name' => 'Controller',
+            'path' => 'app/Http/Controllers/Admin/',
+            'file' => 'DummyClassController.php',
+            'type' => 'primary',
+        ],
+        [
+            'name' => 'Test',
+            'path' => 'tests/Unit',
+            'file' => 'DummyClassTest.php',
+            'type' => 'danger',
+        ],
+        [
+            'name' => 'Vue',
+            'path' => 'resources/views/admin/DummySnakeClass/',
+            'file' => 'index.vue',
+            'type' => 'warning',
+        ],
+        [
+            'name' => 'Request',
+            'path' => 'app/Http/Requests/',
+            'file' => 'DummyClassRequest.php',
+            'type' => 'success',
+        ]
+    ],
+    // Custom parameters
+    'customDummys' => [
+        'DummyAuthor'=>env('GENERATOR_AUTHOR','system')
+    ]
 ];
 ```
 
-## Notice
+## Update Log
 
-Only Chinese and English are supported by laravel generator now 
-
-## Change log
-
-Please see the [changelog](changelog.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [contributing.md](contributing.md) for details and a todolist.
-
-## Security
-
-If you discover any security related issues, please email foryoufeng@gmail.com instead of using the issue tracker.
-
-## License
+View [changelog](changelog.md) for update logs.
 
 MIT. Please see the [license file](license.md) for more information.

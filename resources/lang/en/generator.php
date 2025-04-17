@@ -55,6 +55,7 @@ return [
      'name'=>'name',
      'addTime'=>'Add Time',
      'updateTime'=>'Update Time',
+     'currentTime'=>'Current Time',
      'file'=>'file',
      'submitError'=>'submit error',
      'submitSuccess'=>'submit success',
