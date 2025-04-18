@@ -300,7 +300,7 @@
                   template:'',
                   language_value:'{{$language_value}}',
                   language_options: [{
-                      value: 'zh-CN',
+                      value: 'zh_CN',
                       label: '简体中文'
                   }, {
                       value: 'en',

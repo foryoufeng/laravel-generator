@@ -6,7 +6,7 @@ use Foryoufeng\Generator\Controllers\GeneratorTemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix(config('laravel-generator.route'))->group(function () {
-    Route::get('{locale?}', [GeneratorController::class, 'index'])->name('generator.index') ->where('locale', 'en|zh-CN');
+    Route::get('{locale?}', [GeneratorController::class, 'index'])->name('generator.index')->where('locale', 'en|zh_CN');
     Route::get('model/{name?}', [GeneratorController::class, 'dummyValues'])->name('generator.dummyValues');
     Route::post('/', [GeneratorController::class, 'store'])->name('generator.store');
     Route::post('migrate', [GeneratorController::class, 'migrate'])->name('generator.migrate');

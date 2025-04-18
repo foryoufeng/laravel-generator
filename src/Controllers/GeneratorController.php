@@ -34,7 +34,7 @@ class GeneratorController extends BaseController
     public function index(Request $request, ?string $locale = null)
     {
         $locale = $locale ?? config('app.locale', 'en');
-        if (! in_array($locale, ['en', 'zh-CN'])) {
+        if (! in_array($locale, ['en', 'zh_CN'])) {
             $locale = 'en';
         }
         App::setLocale($locale);
