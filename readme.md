@@ -9,6 +9,7 @@
 </p>
 
 # Laravel Generator
+## [中文文档](readme_zh_CN.md)
 A graphical interface code generator for quickly generating code for Laravel applications.
 
 
