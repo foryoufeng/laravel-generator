@@ -138,9 +138,9 @@
                     </el-submenu>
                     {{--自定义变量值--}}
                     <el-submenu index="3">
-                        <template slot="title"><i class="el-icon-menu"></i>CustomDummys</template>
+                        <template slot="title"><i class="el-icon-menu"></i>Custom Keys</template>
                         <el-menu-item-group>
-                            @foreach($customDummys as $k=>$customDummy)
+                            @foreach($custom_keys as $k=>$val)
                                 <el-menu-item index="3-{{ $loop->index }}" @click="insertEditor('{{ $k }}')" >
                                     {{ $k }}
                                 </el-menu-item>
@@ -283,7 +283,6 @@
 @section('js')
     <link rel="stylesheet" data-name="vs/editor/editor.main" href="/laravel-generator/assets/vs/editor/editor.main.css">
     <script src="/laravel-generator/assets/vs/loader.js"></script>
-    <script src="/laravel-generator/assets/js/baiduTemplate.js"></script>
     <script src="/laravel-generator/assets/vs/editor/editor.main.nls.js"></script>
     <script src="/laravel-generator/assets/vs/editor/editor.main.js"></script>
     <script src="/laravel-generator/assets/vs/basic-languages/java/java.js"></script>
@@ -459,16 +458,8 @@
                       }
                       str=str.replace(new RegExp(this.dummyAttrs[index],"gm"),this.laravel_generators[index]);
                   }
-                  return this.replaceCustomDummy(str);
-              },
-              //替换自定义变量
-              replaceCustomDummy(str){
-                  var customDummys=@json($customDummys);
-                  for (var index in customDummys){
-                      str=str.replace(new RegExp(index,"gm"),customDummys[index]);
-                  }
                   return str;
-              }
+              },
           },
            computed: {
                 fullPathName: function () {
@@ -478,7 +469,6 @@
                 }
            },
           mounted(){
-                baidu.template.ESCAPE = false;
                 var model = monaco.editor.createModel('','java');
                 this.editor = monaco.editor.create(document.getElementById('container'), {
                     model: model,
@@ -488,31 +478,17 @@
                     language: 'java',
                     readOnly:true
                 });
-                this.editor.onDidChangeModelContent(e => {
-                    var data={
-                        Template:'BaiduTemplate',
-                        DummyTableFields:this.laravel_generators['tableFields'],
-                        DummyModelFields:this.laravel_generators['modelFields'],
-                        DummyRelationShips:this.laravel_generators['relationships'],
-                    }
-                    try {
-                        this.form.template=this.editor.getValue();
-                        var code=this.handleEnterKey(this.editor.getValue());
-                        code=this.replaceDummyClass(code);
-                        var temp=baidu.template(code, data);
-                        html = this.replaceAll(temp,"``","\n");
-                        html=this.replaceAll(html,'&#92;','\\');
-                        html=this.replaceAll(html,'&#39;','\'');
-                        this.editor2.setValue(html);
-                    }catch (e) {
-                        this.$message({
-                            dangerouslyUseHTMLString: true,
-                            type: 'error',
-                            message: "@lang('laravel-generator::generator.templateError')"
-                        });
-                        $("#errorMsg").html();
-                    }
-
+                this.editor.onDidBlurEditorText(e => {
+                    console.log("editor change")
+                    this.form.template=this.editor.getValue();
+                    axios.post('{{ route('generator.template.compile') }}',{'template':this.editor.getValue()}).then(function(res){
+                        const data=res.data;
+                        if(data.errcode==0){
+                            vm.editor2.setValue(data.data.template);
+                        }else{
+                            vm.$message.error(data.message);
+                        }
+                    });
                 });
                 this.editor.setValue(this.form.template);
           }

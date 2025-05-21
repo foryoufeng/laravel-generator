@@ -16,6 +16,8 @@ use Foryoufeng\Generator\Models\LaravelGeneratorType;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 /**
@@ -72,12 +74,12 @@ class GeneratorTemplateController extends BaseController
         // 可用的函数
         $functions = GeneratorUtils::getFunctions();
         // 自定义变量
-        $customDummys = config('laravel-generator.customDummys', []);
+        $custom_keys = config('laravel-generator.custom_keys', []);
         $tags = config('laravel-generator.tags');
         $language_value = $locale === 'en' ? 'English' : '简体中文';
 
         return view('laravel-generator::template_update', compact('template_types', 'tags', 'locale', 'language_value',
-            'laravel_generators', 'dummyAttrs', 'functions', 'form', 'customDummys'));
+            'laravel_generators', 'dummyAttrs', 'functions', 'form', 'custom_keys'));
     }
 
     /**
@@ -197,5 +199,34 @@ class GeneratorTemplateController extends BaseController
         }
 
         return $form;
+    }
+
+    public function compile(Request $request)
+    {
+        $template = $request->get('template');
+        if(!$template){
+            return $this->error(trans('laravel-generator::generator.template_not_empty'));
+        }
+        $template = str_replace('<?php','#php#',$template);
+        // 提供的演示数据
+        $laravel_generators = GeneratorUtils::getGenerators();
+        // 可用的假属性字段
+        $dummyAttrs = GeneratorUtils::getDummyAttrs();
+        $replacements = [];
+        foreach ($dummyAttrs as $key => $placeholder) {
+            if (isset($laravel_generators[$key])) {
+                $replacements[$placeholder] = $laravel_generators[$key];
+            }
+        }
+        try {
+            $result = Blade::render($template,$laravel_generators);
+            $replacements['#php#'] = '<?php';
+            $result = str_replace(array_keys($replacements), array_values($replacements), $result);
+
+            return $this->success(['template'=>$result]);
+        }catch (\Exception $exception){
+            Log::error($exception);
+            return $this->error($exception->getMessage()." in line-".$exception->getLine());
+        }
     }
 }

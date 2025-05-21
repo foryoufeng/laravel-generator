@@ -113,8 +113,6 @@ class GeneratorUtils
             'currentTime' => 'DummyCurrentTime',
             'pluralClassName' => 'DummyPluralClass',
             'snakePluralClassName' => 'DummySnakePluralClass',
-            'tableFields' => 'DummyTableFields',
-            'relationships' => 'DummyRelationShips',
         ];
     }
 
@@ -145,79 +143,42 @@ class GeneratorUtils
     {
         return [
             // the if
-            'if' => '<%if(false) { %>
+            'if' => '@if(true)
 
-<%}else{%>
+@else
 
-<h2>is else</h2>
-
-<%}%>',
+@endif',
             // the elseif
-            'elseif' => '<%if(false) { %>
+            'elseif' => '@if(true)
 
-<%}else if(1==1){%>
+@elseif
 
-else if
-<%}else{%>
+@else
 
-<h2>is else</h2>
-
-<%}%>',
+@endif',
             // the for
-            'for' => '<%for(var i=0;i<10;i++){%>
-<li><%=i%></li>
+            'for' => '@foreach ($users as $user)
 
-<%}%>',
-            // the tableFields
-            'tableFields' => '<tr>
-<%for(field of DummyTableFields){%>
-    <%if(field.is_show_lists) { %>
-    <td><%=field.field_display_name%></td>
-    <%}%>
-<%}%>
-</tr>
-@foreach ($datas as $data)
-<tr>
-<%for(field of DummyTableFields){%>
-    <%if(field.is_show_lists) { %>
-    <td>{{ $data-><%=field.field_name%> }}</td>
-    <%}%>
-<%}%>
-</tr>
-<tr>
-@endforeach
-',
+@endforeach',
             // the tableFieldsFor
-            'tableFieldsFor' => '<%for(item of DummyTableFields){%>
-<%=item.field_name%>
-<%}%>
-',
-            // the tableFieldsFor
-            'primary_key' => "<%if('id'!=DummyModelFields.primary_key){%>
-protected \$primaryKey = '<%=DummyModelFields.primary_key%>';
-<%}%>
-",
-            // the tableFieldsFor
-            'timestamps' => '<%if(!DummyModelFields.timestamps){%>
-public $timestamps = false;
-<%}%>
-',
-            // the tableFieldsFor
-            'soft_deletes' => '<%if(!DummyModelFields.soft_deletes){%>
+            'tableFieldsFor' => '@foreach ($tableFields as $field)
+{{ $field[\'field_name\'] }}
+@endforeach',
 
-<%}%>
+            // the tableFieldsFor
+            'soft_deletes' => '@if(DummyModelFields[\'soft_deletes\']){%>
+
+@endif
 ',
             // the tableFieldsFor
-            'fillable' => 'protected $fillable = [<%for(item of DummyTableFields){%><%if(\'id\'!=item.field_name) { %>\'<%=item.field_name%>\',<%}%><%}%>];',
+            'fillable' => 'protected \$fillable = [@foreach($tableFields as $field) @if($field[\'field_name\']!=\'id\')\'{{ $field[\'field_name\'] }}\',@endif @endforeach];',
 
-            // the var
-            'var' => '<%=Template%>',
             // the rule
-            'rule' => "<%for(field of DummyTableFields){%>
-    <%if('file'==field.rule) { %>
-    <input type='file' name='<%=field.field_name%>'>
-    <%}%>
-<%}%>",
+            'rule' => '@foreach ($tableFields as $field)
+    @if(\'file\'==$field[\'rule\')
+    <input type=\'file\' name=\'{{$field[\'field_name\'] }}\'>
+    @endif
+@endforeach',
             'relationships' => "<%for(relationship of DummyRelationShips){%>
     <%if('hasMany'==relationship.relationship) { %>
      public function <%=relationship.snake_plural_model%>(){
@@ -292,7 +253,7 @@ public $timestamps = false;
             'modelFields' => [
                 'primary_key' => 'id',
                 'timestamps' => true,
-                'soft_deletes' => false,
+                'soft_deletes' => true,
             ],
             'relationships' => [
                 [

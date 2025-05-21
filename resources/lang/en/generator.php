@@ -84,5 +84,5 @@ return [
      'SnakeClassNameDesc'=>'will be replaced to snake_case such as laravel_generator',
      'PluralClassNameDesc'=>'will be replaced to its plural form,currently only supports the English language such as LaravelGenerators',
      'SnakePluralClassNameDesc'=>'will be replaced to snake and then to its plural form such as laravel_generators',
-     'templateError'=>"<p class='margin_top'>Template syntax error！common errors：</p><p class='margin_top'>1.'<%'和'%>'To come in pairs, you can't just use one！</p><p class='margin_top'>2.syntax error .can refer to<a href='http://wangxiao.github.io/BaiduTemplate/' target='_blank'>BaiduTemplate</a>。"
+     'template_not_empty' => "The template cannot be empty"
 ];

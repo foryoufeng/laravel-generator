@@ -46,7 +46,7 @@ return [
             'type'=>'success',
         ]
     ],
-    'customDummys'=>[
-        'DummyAuthor'=>env('GENERATOR_AUTHOR','system')
+    'custom_keys'=>[
+        'author'=>env('GENERATOR_AUTHOR','system')
     ]
 ];

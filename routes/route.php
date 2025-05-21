@@ -14,6 +14,7 @@ Route::prefix(config('laravel-generator.route'))->group(function () {
     Route::get('template/update/{locale?}', [GeneratorTemplateController::class, 'update'])->name('generator.template.update');
     Route::post('template/save', [GeneratorTemplateController::class, 'save'])->name('generator.template.save');
     Route::post('template/delete', [GeneratorTemplateController::class, 'delete'])->name('generator.template.delete');
+    Route::post('template/compile', [GeneratorTemplateController::class, 'compile'])->name('generator.template.compile');
     Route::post('template/updateType', [GeneratorTemplateController::class, 'updateType'])->name('generator.template.updateType');
     Route::get('logs', [GeneratorController::class, 'getLogs'])->name('generator.logs');
     Route::post('log/delete', [GeneratorController::class, 'deleteLog'])->name('generator.deleteLog');

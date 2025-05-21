@@ -408,48 +408,29 @@ stub;
      */
     private function getModelTemplate()
     {
-        return "<?php
+        return '<?php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-<%* soft delete *%>
-<%if(DummyModelFields.soft_deletes){%>
+@if($modelFields[\'soft_deletes\'])
 use Illuminate\Database\Eloquent\SoftDeletes;
-<%}%>
+@endif
+
 
 class DummyClass extends Model
 {
 
-    /** @use HasFactory<\Database\Factories\DummyClassFactory> */
+    /** @@use HasFactory<\Database\Factories\DummyClassFactory> */
     use HasFactory;
-<%if(DummyModelFields.soft_deletes){%>
-     use SoftDeletes;
-<%}%>
-     protected \$fillable = [<%for(item of DummyTableFields){%><%if('id'!=item.field_name) { %>'<%=item.field_name%>',<%}%><%}%>];
+@if($modelFields[\'soft_deletes\'])
+    use SoftDeletes;
+@endif
+@if(!$modelFields[\'timestamps\'])
+    public $timestamps = false;
+@endif
 
-<%if(!DummyModelFields.timestamps){%>
-     public \$timestamps = false;
-<%}%>
-
-<%for(relationship of DummyRelationShips){%>
-    <%if('hasMany'==relationship.relationship) { %>
-     public function <%=relationship.snake_plural_model%>(){
-         return \$this->hasMany(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
-     }
-
-    <%}else{%>
-     public function <%=relationship.snake_model%>(){
-         return \$this-><%=relationship.relationship%>(<%=relationship.model%>::class<%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
-     }
-
-    <%}%>
-<%}%>
-
-
-
-
-}";
+}';
     }
 }
