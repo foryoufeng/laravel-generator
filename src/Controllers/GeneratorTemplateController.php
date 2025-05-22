@@ -74,12 +74,12 @@ class GeneratorTemplateController extends BaseController
         // 可用的函数
         $functions = GeneratorUtils::getFunctions();
         // 自定义变量
-        $custom_keys = config('laravel-generator.custom_keys', []);
-        $tags = config('laravel-generator.tags');
+        $customKeys = GeneratorUtils::getCustomKeys();
+        $tags = GeneratorUtils::getTags();
         $language_value = $locale === 'en' ? 'English' : '简体中文';
 
         return view('laravel-generator::template_update', compact('template_types', 'tags', 'locale', 'language_value',
-            'laravel_generators', 'dummyAttrs', 'functions', 'form', 'custom_keys'));
+            'laravel_generators', 'dummyAttrs', 'functions', 'form', 'customKeys'));
     }
 
     /**
@@ -207,26 +207,11 @@ class GeneratorTemplateController extends BaseController
         if(!$template){
             return $this->error(trans('laravel-generator::generator.template_not_empty'));
         }
-        $template = str_replace('<?php','#php#',$template);
-        // 提供的演示数据
-        $laravel_generators = GeneratorUtils::getGenerators();
-        // 可用的假属性字段
-        $dummyAttrs = GeneratorUtils::getDummyAttrs();
-        $replacements = [];
-        foreach ($dummyAttrs as $key => $placeholder) {
-            if (isset($laravel_generators[$key])) {
-                $replacements[$placeholder] = $laravel_generators[$key];
-            }
-        }
         try {
-            $result = Blade::render($template,$laravel_generators);
-            $replacements['#php#'] = '<?php';
-            $result = str_replace(array_keys($replacements), array_values($replacements), $result);
-
+            $result = GeneratorUtils::compile($template);
             return $this->success(['template'=>$result]);
         }catch (\Exception $exception){
-            Log::error($exception);
-            return $this->error($exception->getMessage()." in line-".$exception->getLine());
+            return $this->error($exception->getMessage());
         }
     }
 }

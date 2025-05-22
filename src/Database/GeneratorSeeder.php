@@ -182,8 +182,8 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  *
  * DummyDisplayName
- * author : DummyAuthor
- * created_at : DummyCurrentTime
+ * author: {{\$customKeys['author']}}
+ * created_at: {{ date('Y-m-d H:i:s') }}
  */
 class DummyClassController extends Controller
 {
@@ -192,27 +192,23 @@ class DummyClassController extends Controller
     {
            \$create_start_time = \$request->get('create_start_time');
            \$create_end_time = \$request->get('create_end_time');
-           <%for(item of DummyTableFields){%>
-        <%if(item.can_search) { %>
-            <%if(item.rule=='numeric') { %>
-             \$<%=item.field_name%> = (int)\$request->get('<%=item.field_name%>');
-             <%}else{%>
-             \$<%=item.field_name%> = \$request->get('<%=item.field_name%>');
-             <%}%>
-         <%}%>
-        <%}%>
-           \$data = DummyClass::orderByDesc('id')
-    <%for(item of DummyTableFields){%>
-        <%if(item.can_search) { %>
-             <%if(item.rule=='string') { %>
-                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>', 'like', "%{\$<%=item.field_name%>}%"))
-             <%}else if(item.rule=='numeric'){%>
-                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>',  \$<%=item.field_name%>))
-             <%}else{%>
-                    ->when(\$<%=item.field_name%>, fn (Builder \$query) => \$query->where('<%=item.field_name%>', 'like', "%{\$<%=item.field_name%>}%"))
-             <%}%>
-         <%}%>
-        <%}%>
+@foreach(\$tableFields as \$field)
+@if(\$field['can_search'])
+           \${{\$field['field_name'] }} = \$request->get('{{\$field['field_name'] }}');
+@endif
+@endforeach
+            \$data = DummyClass::orderByDesc('id')
+@foreach(\$tableFields as \$field)
+@if(\$field['can_search'])
+@if('numeric'==\$field['rule'])
+                    ->when(\${{\$field['field_name'] }}, fn (Builder \$query) => \$query->where('{{\$field['field_name'] }}',  \${{\$field['field_name'] }}))
+@elseif('string'==\$field['rule'])
+                    ->when(\${{\$field['field_name'] }}, fn (Builder \$query) => \$query->where('{{\$field['field_name'] }}', 'like', "%\${{\$field['field_name'] }}%"))
+@else
+                    ->when(\${{\$field['field_name'] }}, fn (Builder \$query) => \$query->where('{{\$field['field_name'] }}', 'like', "%\${{\$field['field_name'] }}%"))
+@endif
+@endif
+@endforeach
                     ->when(\$create_start_time, fn (Builder \$query) => \$query->where('created_at', '>=', \$create_start_time))
                     ->when(\$create_end_time, fn (Builder \$query) => \$query->where('created_at', '<=', \$create_end_time))
                     ->paginate();
@@ -235,18 +231,18 @@ class DummyClassController extends Controller
         }
         \$data=\$request->validate([
             'id' => 'required|int',
-            <%for(item of DummyTableFields){%>
-                 <%if(item.rule=='string' && item.nullable==false) { %>
-             '<%=item.field_name%>'=>'required',
-                 <%}%>
-            <%}%>
+@foreach(\$tableFields as \$field)
+@if('string'==\$field['rule'] && false==\$field['nullable'])
+            '{{\$field['field_name'] }}' => 'required'
+@endif
+@endforeach
         ],[],[
             'id' => 'ID',
-            <%for(item of DummyTableFields){%>
-                 <%if(item.rule=='string') { %>
-             '<%=item.field_name%>'=>'<%=item.field_display_name%>',
-                 <%}%>
-            <%}%>
+@foreach(\$tableFields as \$field)
+@if('string'==\$field['rule'] && false==\$field['nullable'])
+            '{{\$field['field_name'] }}' => '{{\$field['field_display_name'] }}'
+@endif
+@endforeach
         ]);
 
         if(!\$DummySnakeClass){
@@ -285,19 +281,19 @@ stub;
 <template>
         <el-form ref="form" :model="form" label-width="60px">
             <el-row>
-                <%for(item of DummyTableFields){%>
-                    <%if(item.can_search && item.rule=='string') { %>
-                     <el-col :span="4">
-                        <el-form-item label="<%=item.field_display_name%>">
-                            <el-input v-model="form.<%=item.field_name%>" @keyup.enter.native="getData()"></el-input>
+@foreach(\$tableFields as \$field)
+@if(\$field['can_search'] && 'string'==\$field['rule'])
+                    <el-col :span="4">
+                        <el-form-item label="{{\$field['field_display_name'] }}">
+                            <el-input v-model="form.{{\$field['field_name'] }}" @keyup.enter.native="getData()"></el-input>
                         </el-form-item>
                     </el-col>
-                    <%}%>
-                <%}%>
+@endif
+@endforeach
                 <el-col :span="4">
                     <el-form-item>
                         <el-button type="primary" @click="getData()">查询</el-button>
-                        <a href="{{ route('home.DummySnakeClass.update') }}" target="_blank"><el-button type="danger">添加</el-button></a>
+                        <a href="/DummySnakeClass/update" target="_blank"><el-button type="danger">添加</el-button></a>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -314,21 +310,21 @@ stub;
                     label="ID"
                     width="180">
             </el-table-column>
-            <%for(item of DummyTableFields){%>
-                <%if(item.is_show_lists) { %>
-                <el-table-column
-                    prop="<%=item.field_name%>"
-                    label="<%=item.field_display_name%>"
-                    width="180">
-                 </el-table-column>
-                <%}%>
-            <%}%>
+@foreach(\$tableFields as \$field)
+@if(\$field['is_show_lists'])
+                    <el-table-column
+                        prop="{{\$field['field_name'] }}"
+                        label="{{\$field['field_display_name'] }}"
+                        width="180">
+                    </el-table-column>
+@endif
+@endforeach
             <el-table-column
                     fixed="right"
                     label="操作"
                     width="200">
                 <template slot-scope="scope">
-                    <a :href="'{{ route('home.DummySnakeClass.update') }}?id='+scope.row.id" target="_blank">
+                    <a :href="'/DummySnakeClass/update'+scope.row.id" target="_blank">
                         <el-button type="primary" icon="el-icon-edit" circle></el-button>
                     </a>
                     <el-button @click="handelDelete(scope.row.id)" type="danger" icon="el-icon-delete" circle></el-button>
@@ -364,19 +360,19 @@ stub;
     <div class="box-header">
         <el-header  id="content-header">
             <el-breadcrumb separator-class="el-icon-arrow-right">
-                <el-breadcrumb-item><a href="{{ route('home.DummySnakeClass.index') }}">DummyDisplayName</a></el-breadcrumb-item>
+                <el-breadcrumb-item><a href="/DummySnakeClass">DummyDisplayName</a></el-breadcrumb-item>
                 <el-breadcrumb-item>@{{ form.id?'编辑':'添加' }}</el-breadcrumb-item>
             </el-breadcrumb>
         </el-header>
         <el-main>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                <%for(item of DummyTableFields){%>
-                    <%if(item.rule=='string') { %>
-                    <el-form-item label="<%=item.field_display_name%>" prop="<%=item.field_name%>">
-                        <el-input v-model="form.<%=item.field_name%>"></el-input>
+@foreach(\$tableFields as \$field)
+@if('string' == \$field['rule'])
+                    <el-form-item label="{{\$field['field_display_name'] }}" prop="{{\$field['field_name'] }}">
+                        <el-input v-model="form.{{\$field['field_name'] }}"></el-input>
                     </el-form-item>
-                    <%}%>
-                <%}%>
+@endif
+@endforeach
                 <el-form-item>
                     <el-button type="primary" @click="onSubmit('form')" :loading="submitLoading">确定</el-button>
                 </el-form-item>

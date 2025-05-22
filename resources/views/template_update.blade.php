@@ -49,9 +49,6 @@
                                     <i slot="reference" class="el-icon-question"></i>
                                 </el-popover>
                             </el-menu-item>
-                            <el-menu-item index="1-7" @click="insertEditor(dummyAttrs['currentTime'])" >
-                                <span>@lang('laravel-generator::generator.currentTime')</span>
-                            </el-menu-item>
                         </el-menu-item-group>
                         <el-submenu index="1-6">
                             <template slot="title">Table Fields</template>
@@ -140,8 +137,8 @@
                     <el-submenu index="3">
                         <template slot="title"><i class="el-icon-menu"></i>Custom Keys</template>
                         <el-menu-item-group>
-                            @foreach($custom_keys as $k=>$val)
-                                <el-menu-item index="3-{{ $loop->index }}" @click="insertEditor('{{ $k }}')" >
+                            @foreach($customKeys as $k=>$val)
+                                <el-menu-item index="3-{{ $loop->index }}" @click="insertEditor('{{ "{{\$customKeys[\'".$k."\']\}\}" }}')" >
                                     {{ $k }}
                                 </el-menu-item>
                             @endforeach
@@ -234,10 +231,6 @@
                                     <el-button type="success" @click="insertFunction('if')" size="small" round><span style="font-size: 14px">if</span></el-button>
                                     <el-button type="success" @click="insertFunction('elseif')" size="small" round><span style="font-size: 14px">elseif</span></el-button>
                                     <el-button type="success" @click="insertFunction('for')" size="small" round><span style="font-size: 14px">for</span></el-button>
-                                    <el-button type="success" @click="insertFunction('for')" size="small" round><span style="font-size: 14px">for</span></el-button>
-                                    <el-button type="success" @click="insertFunction('tableFields')" size="small" round><span style="font-size: 14px">tableFields</span></el-button>
-                                    <el-button type="success" @click="insertFunction('tableFieldsFor')" size="small" round><span style="font-size: 14px">For tableFields</span></el-button>
-                                    <el-button type="success" @click="insertFunction('var')" size="small" round><span style="font-size: 14px">var</span></el-button>
                                     <el-button type="success" @click="insertFunction('rule')" size="small" round><span style="font-size: 14px">rule</span></el-button>
                                     <el-button type="success" @click="insertFunction('relationships')" size="small" round><span style="font-size: 14px">relationships</span></el-button>
                                 </div>
@@ -376,33 +369,6 @@
                   this.editor.focus();
               },
               /**
-               * 处理回车换行
-               */
-              handleEnterKey(codeTemplate) {
-                    codeTemplate = this.replaceAll(codeTemplate,"\t","    ");
-                    var returnCode = "";
-                    var codes = codeTemplate.split("\n");
-                    for(var i = 0 ; i < codes.length; i ++) {
-                        if (codes[i].trim().indexOf("<%") == 0) {
-                            if(codes[i].trim().indexOf('<%\=') == 0){
-                                    returnCode+=codes[i].trim()+ "``";
-                            }else {
-                                returnCode += codes[i].trim()
-                            }
-                        }else{
-                            returnCode+=codes[i]+ "``";
-                        }
-                    }
-
-                    return returnCode;
-              },
-              /**
-               * 替换全部
-               */
-              replaceAll(strVal,search,replace){
-                  return strVal.replace(new RegExp(search,"gm"),replace);
-              },
-              /**
                * 选择模板分类
                */
               selectChange(){
@@ -460,6 +426,16 @@
                   }
                   return str;
               },
+              compile(template){
+                  axios.post('{{ route('generator.template.compile') }}',{'template':template}).then(function(res){
+                      const data=res.data;
+                      if(data.errcode==0){
+                          vm.editor2.setValue(data.data.template);
+                      }else{
+                          vm.$message.error(data.message);
+                      }
+                  });
+              }
           },
            computed: {
                 fullPathName: function () {
@@ -480,17 +456,13 @@
                 });
                 this.editor.onDidBlurEditorText(e => {
                     console.log("editor change")
-                    this.form.template=this.editor.getValue();
-                    axios.post('{{ route('generator.template.compile') }}',{'template':this.editor.getValue()}).then(function(res){
-                        const data=res.data;
-                        if(data.errcode==0){
-                            vm.editor2.setValue(data.data.template);
-                        }else{
-                            vm.$message.error(data.message);
-                        }
-                    });
+                    let template = this.editor.getValue();
+                    this.form.template = template;
+                    this.compile(template);
                 });
+                //编辑器赋值
                 this.editor.setValue(this.form.template);
+                this.compile(this.form.template);
           }
         });
     </script>

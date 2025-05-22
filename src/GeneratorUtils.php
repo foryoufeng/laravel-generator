@@ -9,7 +9,9 @@
 
 namespace Foryoufeng\Generator;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -18,6 +20,36 @@ use Illuminate\Support\Str;
  */
 class GeneratorUtils
 {
+    /**
+     * @param $template
+     * @return string
+     * @throws \Exception
+     */
+    public static function compile($template) :string
+    {
+        $template = str_replace('<?php','#php#',$template);
+        // 提供的演示数据
+        $laravel_generators = static::getGenerators();
+        // 可用的假属性字段
+        $dummyAttrs = static::getDummyAttrs();
+        $replacements = [];
+        foreach ($dummyAttrs as $key => $placeholder) {
+            if (isset($laravel_generators[$key])) {
+                $replacements[$placeholder] = $laravel_generators[$key];
+            }
+        }
+        $data = array_merge($laravel_generators,[
+            'customKeys' => static::getCustomKeys()
+        ]);
+        try {
+            $result = Blade::render($template,$data);
+            $replacements['#php#'] = '<?php';
+            return str_replace(array_keys($replacements), array_values($replacements), $result);
+        }catch (\Exception $exception){
+            Log::error($exception);
+            throw new \Exception($exception->getMessage()." in line-".$exception->getLine());
+        }
+    }
     /**
      * get all of tables in the default database.
      */
@@ -110,9 +142,42 @@ class GeneratorUtils
             'classDisplayName' => 'DummyDisplayName',
             'camelClassName' => 'DummyCamelClass',
             'snakeClassName' => 'DummySnakeClass',
-            'currentTime' => 'DummyCurrentTime',
             'pluralClassName' => 'DummyPluralClass',
             'snakePluralClassName' => 'DummySnakePluralClass',
+        ];
+    }
+    public static function getCustomKeys()
+    {
+        return config('laravel-generator.custom_keys', []);
+    }
+
+    public static function getTags():array
+    {
+        return [
+            [
+                'name'=>'Controller',
+                'path'=>'app/Http/Controllers/Admin/',
+                'file'=>'DummyClassController.php',
+                'type'=>'primary',
+            ],
+            [
+                'name'=>'Test',
+                'path'=>'tests/Unit',
+                'file'=>'DummyClassTest.php',
+                'type'=>'danger',
+            ],
+            [
+                'name'=>'Vue',
+                'path'=>'resources/views/admin/DummySnakeClass/',
+                'file'=>'index.vue',
+                'type'=>'warning',
+            ],
+            [
+                'name'=>'Request',
+                'path'=>'app/Http/Requests/',
+                'file'=>'DummyClassRequest.php',
+                'type'=>'success',
+            ]
         ];
     }
 
@@ -126,7 +191,6 @@ class GeneratorUtils
     {
         return [
             'DummyClass' => $modelName,
-            'DummyCurrentTime' => date('Y-m-d H:i:s'),
             'DummyCamelClass' => Str::camel($modelName),
             'DummySnakeClass' => Str::snake($modelName),
             'DummyPluralClass' => Str::plural($modelName),
@@ -156,26 +220,27 @@ class GeneratorUtils
 @else
 
 @endif',
-            // the for
-            'for' => '@foreach ($users as $user)
-
-@endforeach',
             // the tableFieldsFor
-            'tableFieldsFor' => '@foreach ($tableFields as $field)
+            'for' => '@foreach($tableFields as $field)
 {{ $field[\'field_name\'] }}
 @endforeach',
 
             // the tableFieldsFor
-            'soft_deletes' => '@if(DummyModelFields[\'soft_deletes\']){%>
+            'soft_deletes' => '@if($modelFields[\'soft_deletes\'])
 
 @endif
 ',
+            'timestamps' => '@if($modelFields[\'timestamps\'])
+
+@endif
+',
+            'primary_key' => '{{ $modelFields[\'primary_key\']}}',
             // the tableFieldsFor
             'fillable' => 'protected \$fillable = [@foreach($tableFields as $field) @if($field[\'field_name\']!=\'id\')\'{{ $field[\'field_name\'] }}\',@endif @endforeach];',
 
             // the rule
             'rule' => '@foreach ($tableFields as $field)
-    @if(\'file\'==$field[\'rule\')
+    @if(\'file\'==$field[\'rule\'])
     <input type=\'file\' name=\'{{$field[\'field_name\'] }}\'>
     @endif
 @endforeach',
@@ -204,7 +269,6 @@ class GeneratorUtils
             'camelClassName' => 'laravelGenerator',
             'snakeClassName' => 'laravel_generator',
             'pluralClassName' => 'LaravelGenerators',
-            'currentTime' => date('Y-m-d H:i:s'),
             'snakePluralClassName' => 'laravel_generators',
             'tableFields' => [
                 [

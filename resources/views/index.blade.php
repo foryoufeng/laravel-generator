@@ -29,7 +29,6 @@
     </style>
 @endsection
 @section('js')
-    <script src="/laravel-generator/assets/js/baiduTemplate.js"></script>
     <script>
         var vm =new Vue({
             el: '#app',
@@ -364,8 +363,7 @@
                     var code=this.handleEnterKey(template);
                     this.dummyValues['DummyDisplayName']=vm.ruleForm.modelDisplayName;
                     code=this.replaceDummyClass(code,this.dummyValues);
-                    var temp=baidu.template(code, data);
-                    var html=this.replaceAll(temp,"``","\n")
+                    var html=this.replaceAll(code,"``","\n")
                     html=this.replaceAll(html,'&#92;','\\')
                     return this.replaceAll(html,'&#39;','\'');
                 },
@@ -373,7 +371,6 @@
                  * 获取解析的数据
                  */
                 getTemplateData(){
-                    baidu.template.ESCAPE = false;
                     var modelFields={
                         primary_key:this.ruleForm.primary_key,
                         timestamps:this.ruleForm.timestamps,
