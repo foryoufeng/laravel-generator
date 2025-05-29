@@ -88,17 +88,20 @@ class GeneratorController extends BaseController
         $data = $request->validate([
             'id' => 'required',
             'modelName' => 'required',
+            'primary_key' => 'required',
+            'soft_deletes' => 'required',
+            'timestamps' => 'required',
             'modelDisplayName' => 'required',
             'submit_type' => 'required',
+            'relationships' => 'array',
+            'table_fields' => 'array',
             'generator_templates' => 'array',
         ]);
-        $id = $data['id'];
-        if ($id > 0) {
-            $log = LaravelGeneratorLog::findOrFail($id);
-        } else {
-            $log = new LaravelGeneratorLog;
-        }
-        $item['model_name'] = $data['modelName'];
+        $model_name = $data['modelName'];
+        $log = LaravelGeneratorLog::firstOrNew([
+            'model_name' => $model_name,
+        ]);
+        $item['model_name'] = $model_name;
         $item['display_name'] = $data['modelDisplayName'];
         $item['creator'] = config('laravel-generator.customDummys.DummyAuthor', '');
         $item['configs'] = json_encode($request->except('id'));
@@ -114,64 +117,62 @@ class GeneratorController extends BaseController
         // 获取模型的信息
         $modelInfo = $this->getModelInfo();
         try {
-            $doMigrate = $request->get('doMigrate', []);
             $table_fields = $request->get('table_fields');
             // 生成数据
-            if (! $doMigrate) {
-                $model_name = $data['modelName'];
+            $model_name = $data['modelName'];
 
-                $create = $request->get('create', []);
-                // 1. 是否运行 Create migration.
-                if (\in_array('migration', $create, true)) {
-                    $table_name = Str::plural(Str::snake(class_basename($model_name)));
-                    $migrationName = 'create_'.$table_name.'_table';
+            $create = $request->get('create', []);
+            // 1. 是否运行 Create migration.
+            if (\in_array('migration', $create, true)) {
+                $table_name = Str::plural(Str::snake(class_basename($model_name)));
+                $migrationName = 'create_'.$table_name.'_table';
 
-                    $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint(
-                        $table_fields,
-                        'id',
-                        $request->get('timestamps'),
-                        $request->get('soft_deletes'),
-                        $request->get('foreigns')
-                    )->create($migrationName, database_path('migrations'), $table_name);
-                }
-                // 2. 是否运行Run migrate.
-                if (\in_array('migrate', $create, true)) {
-                    Artisan::call('migrate');
-                    $message = Artisan::output();
-                    $paths['migrate'] = $message;
-                }
-                // 4.生成模板文件
-                $generator_templates = $data['generator_templates'];
-                $file = app('files');
+                $paths['migration'] = (new MigrationCreator(app('files'), database_path('migrations')))->buildBluePrint(
+                    $table_fields,
+                    'id',
+                    $request->get('timestamps'),
+                    $request->get('soft_deletes'),
+                    $request->get('foreigns')
+                )->create($migrationName, database_path('migrations'), $table_name);
+            }
+            // 2. 是否运行Run migrate.
+            if (\in_array('migrate', $create, true)) {
+                Artisan::call('migrate');
+                $message = Artisan::output();
+                $paths['migrate'] = $message;
+            }
+            // 4.生成模板文件
+            $generator_templates = $data['generator_templates'];
+            $file = app('files');
 
-                foreach ($generator_templates as $k => $template) {
-                    $file_real_name = $template['file_real_name'];
-                    $path = base_path($file_real_name);
-                    if ($file->exists($path)) {
-                        // route special handling
-                        if (str_contains($file_real_name, 'routes/') && str_contains($file_real_name, '.php')) {
-                            $file->append($path, str_replace('<?php', '', $template['template']));
-                            $paths['files-'.($k + 1)] = "file [$file_real_name] append success !";
-                        } else {
-                            $paths['files-'.($k + 1)] = "file [$file_real_name] already exists!";
-                        }
+            foreach ($generator_templates as $k => $template) {
+                $file_real_name = $template['file_real_name'];
+                $content = GeneratorUtils::compile($template['template'],$data);
+                $path = base_path($file_real_name);
+                if ($file->exists($path)) {
+                    // route special handling
+                    if (str_contains($file_real_name, 'routes/') && str_contains($file_real_name, '.php')) {
+                        $file->append($path, str_replace('<?php', '', $content));
+                        $paths['files-'.($k + 1)] = "file [$file_real_name] append success !";
                     } else {
-                        $paths['files-'.($k + 1)] = (new FileCreator($template['file_real_name'], $template['template']))->create();
+                        $paths['files-'.($k + 1)] = "file [$file_real_name] already exists!";
                     }
+                } else {
+                    $paths['files-'.($k + 1)] = (new FileCreator($template['file_real_name'], $content))->create();
                 }
-                // 5.处理关联关系
-                $relationships = $request->get('relationships');
-                $this->dealRelationShips($relationships, $model_name, $modelInfo);
-                // 6.是否运行idea代码提示
-                if (\in_array('ide-helper', $create, true)) {
-                    Artisan::call('ide-helper:models', [
-                        '--write' => true,
-                        '--write-eloquent-helper' => true,
-                        'model' => [
-                            ucfirst(str_replace('/', '\\', $modelInfo->path).$model_name),
-                        ],
-                    ]);
-                }
+            }
+            // 5.处理关联关系
+            $relationships = $request->get('relationships');
+            $this->dealRelationShips($relationships, $model_name, $modelInfo);
+            // 6.是否运行idea代码提示
+            if (\in_array('ide-helper', $create, true)) {
+                Artisan::call('ide-helper:models', [
+                    '--write' => true,
+                    '--write-eloquent-helper' => true,
+                    'model' => [
+                        ucfirst(str_replace('/', '\\', $modelInfo->path).$model_name),
+                    ],
+                ]);
             }
         } catch (\Exception $exception) {
             return $this->error($exception->getFile().'-'.$exception->getLine().':'.$exception->getMessage());

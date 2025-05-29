@@ -427,6 +427,17 @@ class DummyClass extends Model
     public $timestamps = false;
 @endif
 
+@foreach($relationShips as $relationship)
+@if(\'hasMany\'==$relationship[\'relationship\'])
+     public function {{$relationship[\'snake_plural_model\']}}(){
+         return $this->hasMany({{$relationship[\'model\']}}::class @if($relationship[\'foreign_key\']),\'{{$relationship[\'foreign_key\']}}\'@endif);
+     }
+@else
+     public function {{$relationship[\'snake_model\']}}(){
+         return $this->{{$relationship[\'relationship\']}}({{$relationship[\'model\']}}::class @if($relationship[\'foreign_key\']),\'{{$relationship[\'foreign_key\']}}\'@endif);
+     }
+@endif
+@endforeach
 }';
     }
 }

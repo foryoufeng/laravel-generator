@@ -132,7 +132,8 @@
                         nullable:false,
                         key:'',
                         default:'',
-                        comment:''
+                        comment:'',
+                        rule:''
                     }],
                 },
                 rules: {
@@ -288,6 +289,7 @@
                           default:'',
                           comment:'',
                           attach:'',
+                          rule:'',
                       }],
                       soft_deletes:false,
                       //选中的模板数据
@@ -587,6 +589,7 @@
                         nullable:false,
                         key:'',
                         default:'',
+                        rule:'',
                         comment:''
                     });
                 },

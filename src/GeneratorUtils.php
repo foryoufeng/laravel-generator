@@ -25,7 +25,7 @@ class GeneratorUtils
      * @return string
      * @throws \Exception
      */
-    public static function compile($template) :string
+    public static function demo_compile($template) :string
     {
         $template = str_replace('<?php','#php#',$template);
         // 提供的演示数据
@@ -43,6 +43,32 @@ class GeneratorUtils
         ]);
         try {
             $result = Blade::render($template,$data);
+            $replacements['#php#'] = '<?php';
+            return str_replace(array_keys($replacements), array_values($replacements), $result);
+        }catch (\Exception $exception){
+            Log::error($exception);
+            throw new \Exception($exception->getMessage()." in line-".$exception->getLine());
+        }
+    }
+    public static function compile($template,array $data) :string
+    {
+        $template = str_replace('<?php','#php#',$template);
+        // 提供的演示数据
+        $generators = [];
+        $generators['tableFields'] = $data['table_fields'];
+        $generators['relationShips'] = $data['relationships'];
+        $generators['modelFields'] = [
+            'primary_key' => $data['primary_key'],
+            'timestamps' => (bool)$data['timestamps'],
+            'soft_deletes' => (bool)$data['soft_deletes'],
+        ];
+        // 可用的假属性字段
+        $replacements = static::getDummyValues($data['modelName']);
+        $generators = array_merge($generators,[
+            'customKeys' => static::getCustomKeys()
+        ]);
+        try {
+            $result = Blade::render($template,$generators);
             $replacements['#php#'] = '<?php';
             return str_replace(array_keys($replacements), array_values($replacements), $result);
         }catch (\Exception $exception){
@@ -239,22 +265,22 @@ class GeneratorUtils
             'fillable' => 'protected \$fillable = [@foreach($tableFields as $field) @if($field[\'field_name\']!=\'id\')\'{{ $field[\'field_name\'] }}\',@endif @endforeach];',
 
             // the rule
-            'rule' => '@foreach ($tableFields as $field)
+            'rule' => '@foreach($tableFields as $field)
     @if(\'file\'==$field[\'rule\'])
     <input type=\'file\' name=\'{{$field[\'field_name\'] }}\'>
     @endif
 @endforeach',
-            'relationships' => "<%for(relationship of DummyRelationShips){%>
-    <%if('hasMany'==relationship.relationship) { %>
-     public function <%=relationship.snake_plural_model%>(){
-         return \$this->hasMany(<%=relationship.model%>::class <%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
+            'relationships' => '@foreach($relationShips as $relationship)
+@if(\'hasMany\'==$relationship[\'relationship\'])
+     public function {{$relationship[\'snake_plural_model\']}}(){
+         return $this->hasMany({{$relationship[\'model\']}}::class @if($relationship[\'foreign_key\']),\'{{$relationship[\'foreign_key\']}}\'@endif);
      }
-    <%}else{%>
-     public function <%=relationship.snake_model%>(){
-         return \$this-><%=relationship.relationship%>(<%=relationship.model%>::class <%if(relationship.foreign_key) { %>,'<%=relationship.foreign_key%>'<%}%>);
+@else
+     public function {{$relationship[\'snake_model\']}}(){
+         return $this->{{$relationship[\'relationship\']}}({{$relationship[\'model\']}}::class @if($relationship[\'foreign_key\']),\'{{$relationship[\'foreign_key\']}}\'@endif);
      }
-    <%}%>
-<%}%>",
+@endif
+@endforeach',
         ];
     }
 
@@ -319,7 +345,7 @@ class GeneratorUtils
                 'timestamps' => true,
                 'soft_deletes' => true,
             ],
-            'relationships' => [
+            'relationShips' => [
                 [
                     'relationship' => 'belongsTo',
                     'model' => 'LaravelGeneratorType',

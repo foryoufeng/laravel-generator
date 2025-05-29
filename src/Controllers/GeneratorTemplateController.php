@@ -208,7 +208,7 @@ class GeneratorTemplateController extends BaseController
             return $this->error(trans('laravel-generator::generator.template_not_empty'));
         }
         try {
-            $result = GeneratorUtils::compile($template);
+            $result = GeneratorUtils::demo_compile($template);
             return $this->success(['template'=>$result]);
         }catch (\Exception $exception){
             return $this->error($exception->getMessage());

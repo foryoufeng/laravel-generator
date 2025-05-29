@@ -52,10 +52,7 @@
                         </el-menu-item-group>
                         <el-submenu index="1-6">
                             <template slot="title">Table Fields</template>
-                        <el-menu-item-group title="field_name">
-                            <el-menu-item index="1-2-1" @click="insertEditor(dummyAttrs['tableFields'])">
-                                <span>Table Fields</span>
-                            </el-menu-item>
+                        <el-menu-item-group>
                             <el-menu-item index="1-2-10" @click="insertEditor('field_name')">
                                 <span>field_name</span>
                             </el-menu-item>
@@ -286,7 +283,6 @@
           data() {
               return {
                   labelsVisible:false,
-                  // labelsVisible:true,
                   editor:{},
                   editor2:{},
                   template:'',
