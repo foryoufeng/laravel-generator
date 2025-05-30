@@ -281,11 +281,11 @@ stub;
 <template>
         <el-form ref="form" :model="form" label-width="60px">
             <el-row>
-@foreach(\$tableFields as \$field)
-@if(\$field['can_search'] && 'string'==\$field['rule'])
+@foreach($tableFields as $field)
+@if($field['can_search'] && 'string'==$field['rule'])
                     <el-col :span="4">
-                        <el-form-item label="{{\$field['field_display_name'] }}">
-                            <el-input v-model="form.{{\$field['field_name'] }}" @keyup.enter.native="getData()"></el-input>
+                        <el-form-item label="{{$field['field_display_name'] }}">
+                            <el-input v-model="form.{{$field['field_name'] }}" @keyup.enter.native="getData()"></el-input>
                         </el-form-item>
                     </el-col>
 @endif
@@ -310,11 +310,11 @@ stub;
                     label="ID"
                     width="180">
             </el-table-column>
-@foreach(\$tableFields as \$field)
-@if(\$field['is_show_lists'])
+@foreach($tableFields as $field)
+@if($field['is_show_lists'])
                     <el-table-column
-                        prop="{{\$field['field_name'] }}"
-                        label="{{\$field['field_display_name'] }}"
+                        prop="{{$field['field_name'] }}"
+                        label="{{$field['field_display_name'] }}"
                         width="180">
                     </el-table-column>
 @endif
@@ -366,10 +366,10 @@ stub;
         </el-header>
         <el-main>
             <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-@foreach(\$tableFields as \$field)
-@if('string' == \$field['rule'])
-                    <el-form-item label="{{\$field['field_display_name'] }}" prop="{{\$field['field_name'] }}">
-                        <el-input v-model="form.{{\$field['field_name'] }}"></el-input>
+@foreach($tableFields as $field)
+@if('string' == $field['rule'])
+                    <el-form-item label="{{$field['field_display_name'] }}" prop="{{$field['field_name'] }}">
+                        <el-input v-model="form.{{$field['field_name'] }}"></el-input>
                     </el-form-item>
 @endif
 @endforeach

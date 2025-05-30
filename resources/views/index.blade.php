@@ -552,21 +552,21 @@
                                         //获取解析的模板数据
                                         let generator_template={
                                             file_real_name:temp.file_real_name,
-                                            template:this.getTemplateCode(temp.template,this.getTemplateData())
+                                            template:temp.template
                                         };
                                         generator_templates.push(generator_template);
                                 }
                             }
                             this.ruleForm.generator_templates=generator_templates;
                             this.loadding=true;
-                            axios.post('{{  route('generator.store') }}',this.ruleForm).then(function(res){
+                            axios.post('{{  route('generator.store') }}',this.ruleForm).then(res=>{
                                 if(res.data.errcode===0){
                                     const data=res.data.data;
                                     let message='';
                                     for(x in data){
                                         message+='<p>'+data[x]+"</p><br>";
                                     }
-                                    vm.$message({
+                                    this.$message({
                                         title: 'success',
                                         dangerouslyUseHTMLString: true,
                                         message: message,
@@ -575,7 +575,8 @@
                                         duration:5000
                                     });
                                 }else{
-                                    vm.$message({
+                                    console.log('error'+res.data.message);
+                                    this.$message({
                                         title: 'error',
                                         dangerouslyUseHTMLString: true,
                                         message: message,
