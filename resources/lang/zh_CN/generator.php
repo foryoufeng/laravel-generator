@@ -84,5 +84,7 @@ return [
     'SnakeClassNameDesc'=>'将被替换为类的小写形式 如laravel_generator',
     'PluralClassNameDesc'=>'将被替换为类的复数形式 如LaravelGenerators',
     'SnakePluralClassNameDesc'=>'将被替换为类的小写复数形式 如laravel_generators',
-    'template_not_empty' => "模板不能为空"
+    'template_not_empty' => "模板不能为空",
+    'exist_table'=>'已存在表',
+    'select'=>'请选择',
 ];

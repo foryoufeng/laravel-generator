@@ -84,5 +84,7 @@ return [
      'SnakeClassNameDesc'=>'will be replaced to snake_case such as laravel_generator',
      'PluralClassNameDesc'=>'will be replaced to its plural form,currently only supports the English language such as LaravelGenerators',
      'SnakePluralClassNameDesc'=>'will be replaced to snake and then to its plural form such as laravel_generators',
-     'template_not_empty' => "The template cannot be empty"
+     'template_not_empty' => "The template cannot be empty",
+     'exist_table' => 'Table already exists',
+     'select' => 'Please select',
 ];

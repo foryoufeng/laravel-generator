@@ -34,6 +34,8 @@
             el: '#app',
             data:{
                 loadding:false,
+                isEditing:false,
+                selectedTableValue:'',
                 dialogTableVisible:false,
                 logTitle:'',
                 logRow:{},
@@ -467,6 +469,21 @@
                         return item.name== _table;
                     });
                     this.referencesFileds[index]=result.columns;
+                },
+                handleTableChange(table){
+                    if(table){
+                        console.log(table)
+                    }else {
+                        this.isEditing = false;
+                    }
+                    // var _table=this.ruleForm.foreigns[index].on;
+                    // var result=this.tables.find(function(item){
+                    //     return item.name== _table;
+                    // });
+                },
+                handleBlur() {
+                    // 失去焦点后退出编辑模式
+                    // this.isEditing = false;
                 },
                 //删除外键的处理
                 deleteForeign(index){

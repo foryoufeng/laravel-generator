@@ -16,6 +16,24 @@
         </el-form-item>
         <el-form-item>
             <el-button type="danger" style="float: left;margin-left: 10px" @click="switchTab('generator',getRuleForm())">{{ trans('laravel-generator::generator.add') }}</el-button>
+            <el-button type="text" style="cursor: pointer;float: left;margin-left: 10px" v-if="!isEditing" @click="isEditing = true" @click="switchTab('generator',getRuleForm())">{{ trans('laravel-generator::generator.exist_table') }}</el-button>
+            <el-select
+                v-else
+                v-model="selectedTableValue"
+                placeholder="{{ trans('laravel-generator::generator.select') }}"
+                filterable
+                clearable
+                @blur="handleBlur"
+                @change="handleTableChange"
+                style="margin-left: 10px;width: 200px;"
+            >
+                <el-option
+                    v-for="item in tables"
+                    :key="item.name"
+                    :label="item.name"
+                    :value="item.name">
+                </el-option>
+            </el-select>
         </el-form-item>
     </el-form>
     <el-table
