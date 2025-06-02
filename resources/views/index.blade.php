@@ -472,7 +472,15 @@
                 },
                 handleTableChange(table){
                     if(table){
-                        console.log(table)
+                        axios.get('{{ route('generator.create_by_table')  }}/'+table).then(res=> {
+                            if(res.data.errcode===0){
+                                console.log(res.data.data)
+                                this.ruleForm.id = 0
+                                this.switchTab('generator',res.data.data)
+                            }else{
+                                vm.$message.error(res.data.message);
+                            }
+                        });
                     }else {
                         this.isEditing = false;
                     }

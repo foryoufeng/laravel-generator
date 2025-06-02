@@ -9,6 +9,11 @@
 
 namespace Foryoufeng\Generator;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\DecimalType;
+use Doctrine\DBAL\Types\FloatType;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -104,8 +109,11 @@ class GeneratorUtils
 
             default => throw new \RuntimeException("Unsupported DB driver: $driver"),
         };
-
+        $ignoreTables = static::ignoreTables();
         foreach ($tableNames as $table) {
+            if (in_array($table, $ignoreTables)) {
+                continue;
+            }
             $cleanName = $prefix ? str_replace($prefix, '', $table) : $table;
             $info[] = [
                 'name' => $cleanName,
@@ -116,6 +124,16 @@ class GeneratorUtils
         return $info;
     }
 
+    public static function ignoreTables(): array
+    {
+        return [
+            'migrations',
+            'laravel_generators',
+            'laravel_generator_configs',
+            'laravel_generator_logs',
+            'laravel_generator_types',
+        ];
+    }
     /**
      * get general Engines.
      *
@@ -266,9 +284,9 @@ class GeneratorUtils
 
             // the rule
             'rule' => '@foreach($tableFields as $field)
-    @if(\'file\'==$field[\'rule\'])
+@if(\'file\'==$field[\'rule\'])
     <input type=\'file\' name=\'{{$field[\'field_name\'] }}\'>
-    @endif
+@endif
 @endforeach',
             'relationships' => '@foreach($relationShips as $relationship)
 @if(\'hasMany\'==$relationship[\'relationship\'])
@@ -359,5 +377,141 @@ class GeneratorUtils
                 ],
             ],
         ];
+    }
+
+    public static function getDoctrineTable(string $tableName): Table
+    {
+        // 获取 Laravel 当前连接配置
+        $config = config('database.connections.' . config('database.default'));
+
+        // 转换为 Doctrine DBAL 配置
+        $doctrineConfig = match ($config['driver']) {
+            'mysql' => [
+                'dbname'   => $config['database'],
+                'user'     => $config['username'],
+                'password' => $config['password'],
+                'host'     => $config['host'],
+                'port'     => $config['port'] ?? 3306,
+                'driver'   => 'pdo_mysql',
+                'charset'  => $config['charset'] ?? 'utf8mb4',
+            ],
+            'pgsql' => [
+                'dbname'   => $config['database'],
+                'user'     => $config['username'],
+                'password' => $config['password'],
+                'host'     => $config['host'],
+                'port'     => $config['port'] ?? 5432,
+                'driver'   => 'pdo_pgsql',
+            ],
+            'sqlite' => [
+                'driver' => 'pdo_sqlite',
+                'path'   => $config['database'],
+            ],
+            default => throw new \RuntimeException('Unsupported driver: ' . $config['driver']),
+        };
+
+        // 创建 Doctrine Connection
+        $connection = DriverManager::getConnection($doctrineConfig);
+        $schemaManager = $connection->createSchemaManager();
+        // 返回 Table 元信息
+        return $schemaManager->introspectTable($tableName);
+    }
+
+    /**
+     * get table columns by table name
+     * @param $table table name
+     * @return array columns
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function getTableColumns($table): array
+    {
+        $table_name = config('database.connections.' . config('database.default').'.prefix').$table;
+        $columns = static::getDoctrineTable($table_name)->getColumns();
+        $res = [
+            'primary_key' => '',
+            'table_fields' => [],
+        ];
+        $i = 0;
+        foreach ($columns as $column) {
+            $table_field = [];
+            $is_auto_increment = $column->getAutoincrement();
+            if(!$is_auto_increment) {
+                $type = $column->getType();
+                $table_field['field_name'] = $column->getName();
+                $table_field['field_display_name'] = $column->getName();
+                $type_name = $type::getTypeRegistry()->lookupName($type);
+                $table_field['type'] = static::typeTransformer($type_name);
+                $attach = '';
+                if ( $type instanceof DecimalType || $type instanceof FloatType) {
+                    $attach .= $column->getPrecision()??'';
+                    $attach .= $column->getScale()?','.$column->getScale():'';
+                } else {
+                    $attach .= $column->getLength()??'';
+                }
+                $table_field['attach'] = $attach;
+                $table_field['nullable'] = $column->getNotnull();
+                $table_field['default'] = $column->getDefault();
+                $table_field['comment'] = $column->getComment();
+                $res['table_fields'][$i] = $table_field;
+                $i++;
+            }else{
+                $res['primary_key'] = $column->getName();
+            }
+
+        }
+
+        return $res;
+    }
+
+    public static function typeTransformer($type)
+    {
+        return match ($type) {
+            'datetime' => 'dateTime',
+            'datetimetz' => 'dateTimeTz',
+            'bigint' => 'bigInteger',
+            default => $type,
+        };
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function tableToForm($table_name): array
+    {
+        $result = [
+            "create" => [],
+            "foreigns" =>[],
+            "timestamps" =>false,
+            "modelName" => static::modelFromTable($table_name),
+            "templates" => [],
+            "modelDisplayName" => $table_name,
+            "relationships" => []
+        ];
+        $table_columns = static::getTableColumns($table_name);
+        $fields = $table_columns['table_fields'];
+        $hasCreatedAt = false;
+        $hasUpdatedAt = false;
+        foreach ($fields as $field) {
+            if ($field['field_name'] === 'created_at') {
+                $hasCreatedAt = true;
+            }
+            if ($field['field_name'] === 'updated_at') {
+                $hasUpdatedAt = true;
+            }
+        }
+        if ($hasCreatedAt && $hasUpdatedAt) {
+            $table_columns['table_fields'] = array_values(array_filter($fields, function ($field) {
+                return !in_array($field['field_name'], ['created_at', 'updated_at']);
+            }));
+            $result['timestamps'] = true;
+        }
+
+        return array_merge($result, $table_columns);
+
+    }
+
+
+    public static function modelFromTable(string $table): ?string {
+        return Str::studly(Str::singular($table));
     }
 }

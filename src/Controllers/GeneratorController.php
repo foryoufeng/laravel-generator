@@ -9,6 +9,7 @@
 
 namespace Foryoufeng\Generator\Controllers;
 
+use Doctrine\DBAL\Exception;
 use Foryoufeng\Generator\FileCreator;
 use Foryoufeng\Generator\GeneratorUtils;
 use Foryoufeng\Generator\Message;
@@ -335,5 +336,20 @@ class GeneratorController extends BaseController
         }
 
         return $this->error('delete error');
+    }
+
+    public function createByTable(string $table_name)
+    {
+        if (!$table_name) {
+            return $this->error('table_name is required');
+        }
+        try {
+            $table_columns = GeneratorUtils::tableToForm($table_name);
+
+            return $this->success($table_columns);
+
+        }catch (Exception $exception){
+            return $this->error($exception->getMessage());
+        }
     }
 }
