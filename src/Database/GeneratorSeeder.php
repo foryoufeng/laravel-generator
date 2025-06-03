@@ -80,9 +80,9 @@ class GeneratorSeeder extends Seeder
     {
         return <<<'stub'
 <?php
-Route::get('DummySnakeClass','DummyClassController@index')->name('admin.DummySnakeClass.index');
-Route::post('DummySnakeClass/update','DummyClassController@update')->name('admin.DummySnakeClass.update');
-Route::post('DummySnakeClass/delete','DummyClassController@delete')->name('admin.DummySnakeClass.delete');
+Route::get('DummySnakeClass',[DummyClassController::class,'index'])->name('admin.DummySnakeClass.index');
+Route::post('DummySnakeClass/update',[DummyClassController::class,'update'])->name('admin.DummySnakeClass.update');
+Route::post('DummySnakeClass/delete',[DummyClassController::class,'delete'])->name('admin.DummySnakeClass.delete');
 stub;
 
     }
@@ -171,7 +171,12 @@ stub;
     {
         $homeTemp = <<<stub
 <?php
-
+/**
+ *
+ * DummyDisplayName
+ * author: {{\$customKeys['author']}}
+ * created_at: {{ date('Y-m-d H:i:s') }}
+ */
 namespace App\Http\Controllers\Admin;
 
 use App\Models\DummyClass;
@@ -179,12 +184,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
-/**
- *
- * DummyDisplayName
- * author: {{\$customKeys['author']}}
- * created_at: {{ date('Y-m-d H:i:s') }}
- */
+
 class DummyClassController extends Controller
 {
 
@@ -311,7 +311,7 @@ stub;
                     width="180">
             </el-table-column>
 @foreach($tableFields as $field)
-@if($field['is_show_lists'])
+@if($field['is_list_display'])
                     <el-table-column
                         prop="{{$field['field_name'] }}"
                         label="{{$field['field_display_name'] }}"

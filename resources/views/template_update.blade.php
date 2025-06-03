@@ -71,8 +71,8 @@
                             <el-menu-item index="1-2-6" @click="insertEditor('key')">
                                 <span>key</span>
                             </el-menu-item>
-                            <el-menu-item index="1-2-7" @click="insertEditor('is_show_lists')">
-                                <span>is_show_lists</span>
+                            <el-menu-item index="1-2-7" @click="insertEditor('is_list_display')">
+                                <span>is_list_display</span>
                             </el-menu-item>
                             <el-menu-item index="1-2-8" @click="insertEditor('can_search')">
                                 <span>can_search</span>
@@ -339,7 +339,7 @@
               updateLabel(){
                   axios.post('{{ route('generator.template.updateType') }}',this.labelForm).then(function(res){
                       var data=res.data;
-                      if(data.errcode==0){
+                      if(data.errcode===0){
                           vm.labelsVisible = false
                           if(vm.labelForm.id>0){
                               vm.$set(vm.template_types,vm.index,{
@@ -400,7 +400,7 @@
                           this.submitDisabled=true;
                           axios.post('{{ route('generator.template.save') }}',this.form).then(function(res){
                               const data=res.data;
-                              if(data.errcode==0){
+                              if(data.errcode===0){
                                   vm.$message.success('@lang('laravel-generator::generator.submitSuccess')');
                               }else{
                                   vm.$message.error(data.message);
@@ -415,7 +415,7 @@
               //替换掉所有的模板变量
               replaceDummyClass(str){
                   for (var index in this.dummyAttrs){
-                      if(index=='tableFields' || index=='modelFields' || index=='relationships'){
+                      if(index==='tableFields' || index==='modelFields' || index==='relationships'){
                           continue;
                       }
                       str=str.replace(new RegExp(this.dummyAttrs[index],"gm"),this.laravel_generators[index]);
@@ -425,7 +425,7 @@
               compile(template){
                   axios.post('{{ route('generator.template.compile') }}',{'template':template}).then(function(res){
                       const data=res.data;
-                      if(data.errcode==0){
+                      if(data.errcode===0){
                           vm.editor2.setValue(data.data.template);
                       }else{
                           vm.$message.error(data.message);
@@ -441,7 +441,7 @@
                 }
            },
           mounted(){
-                var model = monaco.editor.createModel('','java');
+                let model = monaco.editor.createModel('','java');
                 this.editor = monaco.editor.create(document.getElementById('container'), {
                     model: model,
                 });
@@ -450,15 +450,13 @@
                     language: 'java',
                     readOnly:true
                 });
-                this.editor.onDidBlurEditorText(e => {
-                    console.log("editor change")
+                this.editor.onDidChangeModelContent(() => {
                     let template = this.editor.getValue();
                     this.form.template = template;
                     this.compile(template);
                 });
                 //编辑器赋值
                 this.editor.setValue(this.form.template);
-                this.compile(this.form.template);
           }
         });
     </script>

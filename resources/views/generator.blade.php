@@ -105,7 +105,7 @@
                     <el-input v-model="table.comment" placeholder="comment"></el-input>
                 </el-col>
                 <el-col :span="1" style="padding-left: 10px">
-                    <el-checkbox v-model="table.is_show_lists"></el-checkbox>
+                    <el-checkbox v-model="table.is_list_display"></el-checkbox>
                 </el-col>
                 <el-col :span="1">
                     <el-checkbox v-model="table.can_search"></el-checkbox>

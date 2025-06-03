@@ -322,7 +322,7 @@ class GeneratorUtils
                     'attach' => '',
                     'nullable' => false,
                     'key' => '',
-                    'is_show_lists' => true,
+                    'is_list_display' => true,
                     'can_search' => true,
                     'rule' => 'numeric',
                 ],
@@ -333,7 +333,7 @@ class GeneratorUtils
                     'attach' => '255',
                     'nullable' => false,
                     'key' => 'unique',
-                    'is_show_lists' => true,
+                    'is_list_display' => true,
                     'can_search' => true,
                     'rule' => 'string',
                 ],
@@ -343,7 +343,7 @@ class GeneratorUtils
                     'type' => 'timestamp',
                     'nullable' => true,
                     'key' => '',
-                    'is_show_lists' => true,
+                    'is_list_display' => true,
                     'can_search' => true,
                     'rule' => 'date',
                 ],
@@ -353,7 +353,7 @@ class GeneratorUtils
                     'type' => 'string',
                     'nullable' => true,
                     'key' => '',
-                    'is_show_lists' => true,
+                    'is_list_display' => true,
                     'can_search' => false,
                     'rule' => 'file',
                 ],
@@ -449,6 +449,10 @@ class GeneratorUtils
                     $attach .= $column->getLength()??'';
                 }
                 $table_field['attach'] = $attach;
+                $table_field['can_search'] = false;
+                $table_field['key'] = '';
+                $table_field['rule'] = '';
+                $table_field['is_list_display'] = false;
                 $table_field['nullable'] = $column->getNotnull();
                 $table_field['default'] = $column->getDefault();
                 $table_field['comment'] = $column->getComment();
@@ -479,9 +483,11 @@ class GeneratorUtils
     public static function tableToForm($table_name): array
     {
         $result = [
+            "id" => 0,
             "create" => [],
             "foreigns" =>[],
             "timestamps" =>false,
+            "soft_deletes" =>false,
             "modelName" => static::modelFromTable($table_name),
             "templates" => [],
             "modelDisplayName" => $table_name,

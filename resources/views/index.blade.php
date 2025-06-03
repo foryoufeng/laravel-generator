@@ -285,7 +285,7 @@
                           field_display_name:'',
                           type:'string',
                           nullable:false,
-                          is_show_lists:true,
+                          is_list_display:true,
                           can_search:false,
                           key:'',
                           default:'',
@@ -470,24 +470,18 @@
                     });
                     this.referencesFileds[index]=result.columns;
                 },
-                handleTableChange(table){
+                handleTableSelected(table){
                     if(table){
                         axios.get('{{ route('generator.create_by_table')  }}/'+table).then(res=> {
                             if(res.data.errcode===0){
-                                console.log(res.data.data)
-                                this.ruleForm.id = 0
                                 this.switchTab('generator',res.data.data)
                             }else{
-                                vm.$message.error(res.data.message);
+                                this.$message.error(res.data.message);
                             }
                         });
                     }else {
                         this.isEditing = false;
                     }
-                    // var _table=this.ruleForm.foreigns[index].on;
-                    // var result=this.tables.find(function(item){
-                    //     return item.name== _table;
-                    // });
                 },
                 handleBlur() {
                     // 失去焦点后退出编辑模式
@@ -532,12 +526,14 @@
                 },
                 //提交generator表单
                 submitForm(formName,submit_type='') {
-
+                    let fieldFlag = false
                     let primary_key=this.ruleForm.primary_key;
-                    //防止添加字段和主键重复
-                    let fieldFlag=this.ruleForm.table_fields.find(function(item){
-                        return item.field_name==primary_key
-                    });
+                    if(primary_key){
+                        //防止添加字段和主键重复
+                        fieldFlag = this.ruleForm.table_fields.find(function(item){
+                            return item.field_name === primary_key
+                        });
+                    }
                     if(fieldFlag){
                         let message='primary_key: '+primary_key+'@lang('laravel-generator::generator.hasExists'),'+'@lang('laravel-generator::generator.delete')' +'@lang('laravel-generator::generator.fieldName')(Field name) '+primary_key
                         this.$message.error(message);
@@ -583,11 +579,10 @@
                                         duration:5000
                                     });
                                 }else{
-                                    console.log('error'+res.data.message);
-                                    this.$message({
+                                    vm.$message({
                                         title: 'error',
                                         dangerouslyUseHTMLString: true,
-                                        message: message,
+                                        message: res.data.message,
                                         center: true,
                                         type: 'error',
                                         duration:8000
@@ -596,7 +591,7 @@
                                 vm.loadding=false;
                             }).catch((error) => {
                                 vm.loadding=false;
-                                vm.$message.error(error);
+                                this.$message.error(error);
                             });
                         } else {
                             return false;
@@ -610,7 +605,7 @@
                         field_display_name:'',
                         searchable:false,
                         type:'string',
-                        is_show_lists:true,
+                        is_list_display:true,
                         can_search:false,
                         nullable:false,
                         key:'',

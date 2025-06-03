@@ -104,7 +104,7 @@ class GeneratorController extends BaseController
         ]);
         $item['model_name'] = $model_name;
         $item['display_name'] = $data['modelDisplayName'];
-        $item['creator'] = config('laravel-generator.customDummys.DummyAuthor', '');
+        $item['creator'] = config('laravel-generator.custom_keys.author', '');
         $item['configs'] = json_encode($request->except('id'));
         $log->fill($item);
         $res = $log->save();

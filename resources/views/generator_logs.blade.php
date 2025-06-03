@@ -24,7 +24,7 @@
                 filterable
                 clearable
                 @blur="handleBlur"
-                @change="handleTableChange"
+                @change="handleTableSelected"
                 style="margin-left: 10px;width: 200px;"
             >
                 <el-option
@@ -100,7 +100,7 @@
         </el-pagination>
     </div>
 </el-tab-pane>
-<el-dialog title="" center :visible.sync="dialogTableVisible">
+<el-dialog title="" center :visible.sync="dialogTableVisible" width="80%">
     <p>
         <h2>
             <span>@lang('laravel-generator::generator.modelName'):</span>
@@ -129,11 +129,11 @@
             </template>
         </el-table-column>
         <el-table-column prop="key" label="Key"></el-table-column>
-        <el-table-column width="150" prop="default" label="Default Value"></el-table-column>
-        <el-table-column width="150" prop="comment" label="Comment"></el-table-column>
+        <el-table-column width="130" prop="default" label="Default Value"></el-table-column>
+        <el-table-column width="130" prop="comment" label="Comment"></el-table-column>
         <el-table-column  label="@lang('laravel-generator::generator.showLists')">
             <template slot-scope="scope">
-                <el-checkbox v-model="scope.row.is_show_lists"></el-checkbox>
+                <el-checkbox v-model="scope.row.is_list_display"></el-checkbox>
             </template>
         </el-table-column>
         <el-table-column  label="@lang('laravel-generator::generator.canSearch')">
