@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-generator` will be documented in this file.
 
+* # Version 4.0
+**更新时间：2025-06-04**
+
+更新日志
+
+* Modified the template engine to blade and changed the default template content / 修改模板引擎为blade，并修改默认模板内容
+* Changed the configuration of the `laravel-generator.php` configuration file / 更改配置文件`laravel-generator.php`的配置
+* Added template migration for existing tables. / 增加已存在表的模板迁移
+
 * # Version 3.0
     * Added support for Laravel 12+  / 增加对Laravel 12+ 的支持
     * Added a record/log panel. / 添加生成记录面板

@@ -67,36 +67,9 @@ return [
         'phone',
         'custom'
     ],
-    //设置标签
-    'tags'=>[
-        [
-            'name'=>'Controller',
-            'path'=>'app/Http/Controllers/Admin/',
-            'file'=>'DummyClassController.php',
-            'type'=>'primary',
-        ],
-        [
-            'name'=>'Test',
-            'path'=>'tests/Unit',
-            'file'=>'DummyClassTest.php',
-            'type'=>'danger',
-        ],
-        [
-            'name'=>'Vue',
-            'path'=>'resources/views/admin/DummySnakeClass/',
-            'file'=>'index.vue',
-            'type'=>'warning',
-        ],
-        [
-            'name'=>'Request',
-            'path'=>'app/Http/Requests/',
-            'file'=>'DummyClassRequest.php',
-            'type'=>'success',
-        ]
-    ],
     //自定义参数
-    'customDummys'=>[
-        'DummyAuthor'=>env('GENERATOR_AUTHOR','system')
+    'custom_keys'=>[
+        'author'=>env('GENERATOR_AUTHOR','system')
     ]
 ];
 ```
