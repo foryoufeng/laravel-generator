@@ -69,6 +69,7 @@ class GeneratorUtils
         ];
         // 可用的假属性字段
         $replacements = static::getDummyValues($data['modelName']);
+        $replacements['DummyDisplayName'] = $data['modelDisplayName'];
         $generators = array_merge($generators,[
             'customKeys' => static::getCustomKeys()
         ]);
